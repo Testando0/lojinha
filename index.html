@@ -134,7 +134,7 @@
         @media(max-width: 768px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
             
-            /* SIDEBAR NO MOBILE: Alinhamento central garantido */
+            /* SIDEBAR NO MOBILE */
             aside { 
                 width: 100%; 
                 height: 60px; 
@@ -163,27 +163,31 @@
             .mobile-controls { 
                 display: flex; 
                 gap: 5px;
-                align-items: center; /* Garante alinhamento vertical */
+                align-items: center; /* GARANTE alinhamento vertical */
                 flex-shrink: 0;
             } 
 
-            /* Ícone de Pesquisa (Lupa): ESTILO SINCORNIZADO para alinhamento perfeito */
+            /* Ícone de Pesquisa (Lupa): RESET AGRESSIVO PARA ALINHAMENTO PERFEITO */
             #btn-search-toggle { 
                 width: 45px; 
                 height: 45px;
                 padding: 0; 
                 border: 1px solid var(--border);
-                border-radius: 6px; /* EXPLICITAMENTE definido para igualar ao .mobile-toggle */
+                border-radius: 6px; 
                 background: transparent;
                 display: flex; 
                 align-items: center;
                 justify-content: center;
                 font-size: 1.2rem;
-                margin-top: 0; /* REMOVIDA qualquer margem extra */
+                margin: 0; 
+                /* --- CORREÇÕES AGRESSIVAS --- */
+                appearance: none; 
+                -webkit-appearance: none;
+                line-height: 1; /* Garante que a altura da linha não crie espaço extra */
             }
             #btn-search-toggle span { display: none; } 
             
-            /* Ícone de Menu Hambúrguer: Mantido no mesmo tamanho da lupa */
+            /* Ícone de Menu Hambúrguer: Sincronizado */
             .mobile-toggle { 
                 width: 45px;
                 height: 45px;
@@ -195,6 +199,7 @@
                 color: var(--text-main); 
                 border: 1px solid var(--border);
                 border-radius: 6px;
+                line-height: 1; /* Sincroniza line-height com o botão */
             }
 
             /* Menu drop-down */
