@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DarkMarket Pro</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> <style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> 
+    <style>
+        /* --- CSS: VARIÁVEIS E ESTILOS PROFISSIONAIS --- */
         :root {
             --bg-body: #121212;
             --bg-sidebar: #1a1a1a;
             --bg-card: #252525;
             --text-main: #e0e0e0;
             --text-muted: #a0a0a0;
-            --primary: #bb86fc;
+            --primary: #bb86fc; /* Roxo */
             --primary-hover: #9965f4;
-            --accent: #03dac6;
+            --accent: #03dac6; /* Ciano/Verde */
             --danger: #cf6679;
             --border: #333;
         }
@@ -52,7 +54,6 @@
         .auth-logo { font-size: 2rem; color: var(--primary); margin-bottom: 20px; font-weight: bold; letter-spacing: 1px; }
 
         /* --- LAYOUT PRINCIPAL --- */
-        /* Sidebar */
         aside {
             width: 260px; background: var(--bg-sidebar); height: 100%;
             display: flex; flex-direction: column; border-right: 1px solid var(--border);
@@ -129,7 +130,6 @@
             .profile-form { grid-template-columns: 1fr; }
         }
         @media(min-width: 769px) { .mobile-toggle { display: none; } }
-
     </style>
 </head>
 <body>
@@ -186,7 +186,7 @@
             <section id="view-shop">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h2>Loja Global</h2>
-                    <button onclick="loadData()" class="btn btn-ghost"><i class="fas fa-sync"></i> Atualizar</button>
+                    <button onclick="loadData()" class="btn btn-ghost"><i class="fas fa-sync"></i> Atualizar Produtos</button>
                 </div>
                 <div id="products-grid" class="grid">
                     </div>
@@ -238,7 +238,7 @@
     </div>
 
     <script>
-        // ================= CONFIGURAÇÃO =================
+        // ================= CONFIGURAÇÃO (SUAS CHAVES) =================
         const BIN_ID = '691ab4a143b1c97be9b262b4'; 
         const API_KEY = '$2a$10$A5x.MiQYJZrXPO9rQ6OfXeOnX7Hvz2JMcb5ZJS78vGK8D3RJoVejy'; 
         const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
@@ -246,9 +246,10 @@
         let globalData = { users: [], products: [] };
         let currentUser = null;
 
-        // --- INICIALIZAÇÃO ---
+        // --- INICIALIZAÇÃO (AGORA USA LOCALSTORAGE) ---
         function init() {
-            const session = sessionStorage.getItem('darkUserPro');
+            // CORREÇÃO: Usa localStorage para persistência de login
+            const session = localStorage.getItem('darkUserPro'); 
             if(session) {
                 currentUser = JSON.parse(session);
                 showApp();
@@ -265,12 +266,13 @@
                 const json = await res.json();
                 globalData = json.record;
                 
-                // Atualizar dados do usuário atual se ele estiver logado (caso tenha mudado em outro PC)
+                // Atualiza dados do usuário atual se ele estiver logado
                 if(currentUser) {
                     const updatedUser = globalData.users.find(u => u.user === currentUser.user);
                     if(updatedUser) {
                         currentUser = updatedUser;
-                        sessionStorage.setItem('darkUserPro', JSON.stringify(currentUser));
+                        // CORREÇÃO: Atualiza no localStorage
+                        localStorage.setItem('darkUserPro', JSON.stringify(currentUser)); 
                         updateSidebarUI();
                     }
                 }
@@ -308,13 +310,14 @@
             const pass = document.getElementById('l-pass').value;
             
             toggleLoader(true);
-            await loadData(); // Garante dados frescos
+            await loadData(); 
 
             const found = globalData.users.find(u => u.user === user && u.pass === pass);
             
             if(found) {
                 currentUser = found;
-                sessionStorage.setItem('darkUserPro', JSON.stringify(found));
+                // CORREÇÃO: Salva permanentemente
+                localStorage.setItem('darkUserPro', JSON.stringify(found)); 
                 showApp();
                 showToast(`Bem-vindo, ${found.user}!`);
             } else {
@@ -339,7 +342,6 @@
                 return showToast("Usuário já existe!");
             }
 
-            // Novo usuário com campos extras de perfil
             const newUser = { 
                 user, pass, pix, wpp,
                 avatar: 'https://ui-avatars.com/api/?name='+user+'&background=bb86fc&color=fff',
@@ -355,7 +357,8 @@
         }
 
         function logout() {
-            sessionStorage.removeItem('darkUserPro');
+            // CORREÇÃO: Limpa o armazenamento permanente
+            localStorage.removeItem('darkUserPro'); 
             window.location.reload();
         }
 
@@ -367,21 +370,19 @@
             const newBio = document.getElementById('edit-bio').value;
 
             toggleLoader(true);
-            await loadData(); // Atualiza antes de editar
+            await loadData();
 
-            // Encontra índice do usuário
             const index = globalData.users.findIndex(u => u.user === currentUser.user);
             if(index !== -1) {
-                // Atualiza objeto na memória
                 globalData.users[index].avatar = newAvatar || globalData.users[index].avatar;
                 globalData.users[index].pix = newPix;
                 globalData.users[index].wpp = newWpp;
                 globalData.users[index].bio = newBio;
 
-                // Salva na nuvem
                 if(await saveData()) {
-                    currentUser = globalData.users[index]; // Atualiza sessão local
-                    sessionStorage.setItem('darkUserPro', JSON.stringify(currentUser));
+                    currentUser = globalData.users[index];
+                    // CORREÇÃO: Atualiza o cache local
+                    localStorage.setItem('darkUserPro', JSON.stringify(currentUser)); 
                     updateSidebarUI();
                     showToast("Perfil atualizado com sucesso!");
                 }
@@ -389,7 +390,6 @@
         }
 
         function renderProfilePage() {
-            // Preenche formulário
             document.getElementById('edit-user').value = currentUser.user;
             document.getElementById('edit-pix').value = currentUser.pix;
             document.getElementById('edit-wpp').value = currentUser.wpp;
@@ -397,7 +397,6 @@
             document.getElementById('edit-avatar').value = currentUser.avatar || '';
             document.getElementById('prof-avatar-preview').src = currentUser.avatar;
 
-            // Renderiza Meus Produtos
             const myGrid = document.getElementById('my-products-grid');
             myGrid.innerHTML = '';
             const myProds = globalData.products.filter(p => p.seller === currentUser.user);
@@ -438,8 +437,6 @@
                 id: Date.now(),
                 seller: currentUser.user,
                 name, img, price, desc,
-                // Dados de contato são pegos dinamicamente do usuário atual na hora da renderização da loja, 
-                // mas salvamos aqui para histórico simples
                 sellerPix: currentUser.pix, 
                 sellerWpp: currentUser.wpp
             });
@@ -470,11 +467,9 @@
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '';
             
-            // Ordenar: mais novos primeiro
             const sortedProds = [...globalData.products].reverse();
 
             sortedProds.forEach(p => {
-                // Tenta achar dados atualizados do vendedor (foto, pix atualizado)
                 const sellerData = globalData.users.find(u => u.user === p.seller) || {};
                 const sellerAvatar = sellerData.avatar || 'https://via.placeholder.com/30';
                 const currentWpp = sellerData.wpp || p.sellerWpp;
@@ -516,22 +511,13 @@
         }
 
         function navTo(screen) {
-            // Esconde todas as seções
             ['view-shop', 'view-sell', 'view-profile'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            // Remove classe active dos botões
             document.querySelectorAll('.nav-menu button').forEach(b => b.classList.remove('active'));
-            
-            // Mostra a escolhida
             document.getElementById('view-'+screen).classList.remove('hidden');
             
-            // Ativa botão correspondente
-            const btnMap = { 'shop': 0, 'sell': 1, 'profile': 2 };
-            // Simplesmente adiciona active visualmente se quiser ser específico, ou usa o index
-            
-            if(screen === 'shop') { renderShop(); }
+            if(screen === 'shop') { renderShop(); document.getElementById('btn-shop').classList.add('active'); }
             if(screen === 'profile') { renderProfilePage(); }
             
-            // Fecha menu mobile se estiver aberto
             document.querySelector('.nav-menu').classList.remove('mobile-open');
         }
 
@@ -559,7 +545,7 @@
 
         function copyText(text) {
             navigator.clipboard.writeText(text);
-            showToast("Copiado para área de transferência!");
+            showToast("Chave copiada!");
         }
 
         // Iniciar
@@ -567,4 +553,3 @@
     </script>
 </body>
 </html>
-
