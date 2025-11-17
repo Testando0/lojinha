@@ -130,18 +130,18 @@
         }
         .toast.show { transform: translateY(0); }
 
-        /* --- MOBILE RESPONSIVO (Com Correção de Alinhamento Assertivo) --- */
+        /* --- MOBILE RESPONSIVO (CORREÇÃO FINAL) --- */
         @media(max-width: 768px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
             
-            /* SIDEBAR NO MOBILE: Linha horizontal no topo */
+            /* SIDEBAR NO MOBILE: Altura e alinhamento central garantido */
             aside { 
                 width: 100%; 
-                height: 60px; /* CHAVE: Altura fixa para alinhar */
+                height: 50px; /* CHAVE: Altura fixa para todos os elementos */
                 flex-direction: row; 
                 justify-content: space-between; 
-                align-items: center; /* CHAVE: Garante alinhamento vertical */
-                padding: 10px; 
+                align-items: center; /* CHAVE: Alinha todos os itens verticalmente */
+                padding: 0 10px; /* Padding horizontal */
             }
 
             .user-mini-profile { 
@@ -149,27 +149,25 @@
                 margin: 0; 
                 padding: 0; 
                 border: none; 
-                gap: 10px; 
+                gap: 8px; 
                 align-items: center; 
-                flex-shrink: 0; /* CHAVE: Impede que o perfil encolha ou desalinhe */
+                flex-shrink: 0; 
+                height: 50px; /* Força a altura para a centralização */
             }
-            .avatar-circle { width: 40px; height: 40px; margin: 0; }
+            .avatar-circle { width: 35px; height: 35px; margin: 0; } /* Tamanho ligeiramente reduzido */
+            .user-name { font-size: 0.95rem; } /* Fonte menor para evitar quebra de linha */
             .user-role { display: none; }
             
-            /* Contêiner para os botões de controle (Hambúrguer e Lupa) */
+            /* Contêiner dos botões: Alinhamento e dimensões fixas */
             .mobile-controls { 
                 display: flex; 
                 gap: 10px; 
-                align-items: center; /* Garante que os controles fiquem alinhados */
+                align-items: center;
+                height: 50px; /* Força a altura para a centralização */
                 flex-shrink: 0;
             } 
 
-            .nav-menu { display: none; position: absolute; top: 60px; left:0; width:100%; background: var(--bg-sidebar); padding: 10px; z-index: 999; }
-            .nav-menu.mobile-open { display: block; }
-            .mobile-toggle { display: block; font-size: 1.5rem; cursor: pointer; color: var(--text-main); }
-            .profile-form { grid-template-columns: 1fr; }
-            
-            /* ESTILO ESPECÍFICO DA LUPA NO MOBILE: APENAS ÍCONE */
+            /* Ícone de Pesquisa (Lupa) */
             #btn-search-toggle { 
                 width: 40px; 
                 height: 40px;
@@ -180,7 +178,23 @@
                 justify-content: center;
                 font-size: 1.2rem;
             }
-            #btn-search-toggle span { display: none; } /* Oculta o texto "Pesquisar" no mobile */
+            #btn-search-toggle span { display: none; }
+            
+            /* Ícone de Menu Hambúrguer */
+            .mobile-toggle { 
+                display: block; 
+                font-size: 1.5rem; 
+                cursor: pointer; 
+                color: var(--text-main); 
+                height: 40px;
+                display: flex; /* Para centralizar o ícone de verdade */
+                align-items: center;
+            }
+
+            /* Menu drop-down */
+            .nav-menu { display: none; position: absolute; top: 50px; left:0; width:100%; background: var(--bg-sidebar); padding: 10px; z-index: 999; }
+            .nav-menu.mobile-open { display: block; }
+            .profile-form { grid-template-columns: 1fr; }
         }
         @media(min-width: 769px) { 
             .mobile-toggle { display: none; } 
