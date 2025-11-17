@@ -81,15 +81,18 @@
         }
         .nav-menu button i { width: 20px; text-align: center; }
 
-        /* NOVO: Estilo para o botão de Pesquisa na sidebar */
+        /* NOVO: Estilo para o botão de Pesquisa na sidebar (melhorando o estilo) */
         #btn-search-toggle {
-            background: transparent; border: none; color: var(--text-muted); 
-            cursor: pointer; padding: 10px; margin-bottom: 10px; border-radius: 6px;
-            text-align: center; font-size: 1.2rem; transition: 0.2s;
+            width: 100%; background: transparent; color: var(--text-muted);
+            text-align: left; padding: 12px; margin-bottom: 5px; border-radius: 6px;
+            display: flex; align-items: center; gap: 10px; font-size: 1rem;
+            border: 1px solid var(--border);
+            justify-content: center;
         }
         #btn-search-toggle:hover {
-            color: var(--primary); background: rgba(187, 134, 252, 0.1); 
+            color: var(--primary); background: rgba(187, 134, 252, 0.1); border-color: var(--primary);
         }
+        #btn-search-toggle i { font-size: 1.2rem; }
 
         /* Conteúdo Principal */
         main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
@@ -184,7 +187,7 @@
             
             <div class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></div>
             
-            <button id="btn-search-toggle" onclick="toggleSearch()" title="Pesquisar Produtos"><i class="fas fa-search"></i></button>
+            <button id="btn-search-toggle" onclick="toggleSearch()" title="Pesquisar Produtos"><i class="fas fa-search"></i> Pesquisar</button>
 
             <nav class="nav-menu" id="nav-menu">
                 <button onclick="navTo('shop')" id="btn-shop" class="active"><i class="fas fa-store"></i> Loja Global</button>
@@ -595,19 +598,22 @@
 
         // --- UI HELPERS ---
         
-        // NOVO: Função para mostrar/esconder a barra de busca
+        // Função para mostrar/esconder a barra de busca
         function toggleSearch() {
             const searchContainer = document.getElementById('search-container');
             const searchInput = document.getElementById('search-term');
             
+            // Navega para a loja antes de mostrar o campo de busca
+            navTo('shop'); 
+
             // Alterna a classe 'hidden'
             searchContainer.classList.toggle('hidden');
             
-            // Se estiver mostrando, foca no campo de input e limpa o campo
+            // Se estiver mostrando, foca no campo de input
             if (!searchContainer.classList.contains('hidden')) {
                 searchInput.focus();
             } else {
-                // Se estiver escondendo, limpa a busca e renderiza a loja completa
+                // Se estiver escondendo e havia busca ativa, limpa e recarrega a loja
                 if (searchInput.value !== '') {
                     searchInput.value = '';
                     renderShop(); 
@@ -636,7 +642,6 @@
             document.getElementById('view-'+screen).classList.remove('hidden');
             
             if(screen === 'shop') { 
-                // Ao navegar para a loja, renderiza (sem termo de busca, se o campo estiver vazio)
                 renderShop(); 
                 document.getElementById('btn-shop').classList.add('active'); 
             }
@@ -646,8 +651,10 @@
             
             document.querySelector('.nav-menu').classList.remove('mobile-open');
             
-            // Sempre esconde a barra de pesquisa ao navegar para outra tela
-            document.getElementById('search-container').classList.add('hidden');
+            // Esconde a barra de pesquisa ao navegar para outra tela que não seja 'shop'
+            if (screen !== 'shop') {
+                document.getElementById('search-container').classList.add('hidden');
+            }
         }
 
         function toggleAuth() {
