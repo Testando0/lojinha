@@ -130,25 +130,28 @@
         }
         .toast.show { transform: translateY(0); }
 
-        /* --- MOBILE RESPONSIVO (Com Correção de Alinhamento) --- */
+        /* --- MOBILE RESPONSIVO (Com Correção de Alinhamento Assertivo) --- */
         @media(max-width: 768px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
+            
             /* SIDEBAR NO MOBILE: Linha horizontal no topo */
             aside { 
-                width: 100%; height: auto; 
+                width: 100%; 
+                height: 60px; /* CHAVE: Altura fixa para alinhar */
                 flex-direction: row; 
                 justify-content: space-between; 
                 align-items: center; /* CHAVE: Garante alinhamento vertical */
                 padding: 10px; 
             }
+
             .user-mini-profile { 
                 flex-direction: row; 
                 margin: 0; 
                 padding: 0; 
                 border: none; 
                 gap: 10px; 
-                /* CHAVE: Alinha o perfil à esquerda, centralizado */
                 align-items: center; 
+                flex-shrink: 0; /* CHAVE: Impede que o perfil encolha ou desalinhe */
             }
             .avatar-circle { width: 40px; height: 40px; margin: 0; }
             .user-role { display: none; }
@@ -157,8 +160,8 @@
             .mobile-controls { 
                 display: flex; 
                 gap: 10px; 
-                /* CHAVE: Garante que os controles fiquem alinhados */
-                align-items: center; 
+                align-items: center; /* Garante que os controles fiquem alinhados */
+                flex-shrink: 0;
             } 
 
             .nav-menu { display: none; position: absolute; top: 60px; left:0; width:100%; background: var(--bg-sidebar); padding: 10px; z-index: 999; }
