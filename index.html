@@ -6,7 +6,7 @@
     <title>DarkMarket Pro Mobile Fixed</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> 
     <style>
-        /* --- CSS: VARIÁVEIS E ESTILOS GERAIS --- */
+        /* (*** O CSS COMPLETO PERMANECE INALTERADO ***) */
         :root {
             --bg-body: #121212;
             --bg-sidebar: #1a1a1a;
@@ -93,7 +93,7 @@
         main { 
             flex: 1; 
             padding: 30px; 
-            padding-bottom: 100px; /* FIX: Maior clearance para o scroll */
+            padding-bottom: 100px; 
             overflow-y: auto; 
             position: relative; 
         }
@@ -209,7 +209,7 @@
             /* CORREÇÃO DO CONTEÚDO PRINCIPAL */
             main { 
                 padding: 15px; 
-                padding-bottom: 80px; /* FIX: Maior clearance para o scroll mobile */
+                padding-bottom: 80px; 
                 overflow-y: auto; 
                 height: calc(100vh - 60px); 
             }
@@ -429,14 +429,12 @@
                 currentUser = JSON.parse(session);
                 showApp();
                 loadData();
-                setupRatingInput(); // ✅ Chamada inicial correta
-            } else {
-                 setupRatingInput(); // Chamada para garantir que a lógica das estrelas seja configurada mesmo sem login (caso o modal seja aberto por debug, embora não deva)
+                // setupRatingInput será chamado no final do script
             }
         }
 
         /* --- FUNÇÕES DE DADOS E CONEXÃO --- */
-
+        // ... (Todas as funções de dados e autenticação permanecem inalteradas)
         async function loadData() {
             toggleLoader(true);
             try {
@@ -468,8 +466,6 @@
             finally { toggleLoader(false); }
         }
 
-        /* --- FUNÇÕES DE AUTENTICAÇÃO E PERFIL --- */
-        
         function toggleSellerInputs() {
             const check = document.getElementById('r-is-seller').checked;
             const div = document.getElementById('seller-inputs');
@@ -584,8 +580,6 @@
             });
         }
         
-        /* --- FUNÇÕES DE LOJA E PRODUTO --- */
-
         function renderShop() {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '';
@@ -643,7 +637,7 @@
                 name: n, img: i, price: pr, desc: d,
                 sellerPix: currentUser.pix, 
                 sellerWpp: currentUser.wpp,
-                reviews: [] // Inicializa array de reviews
+                reviews: []
             });
 
             if(await saveData()) {
@@ -712,7 +706,6 @@
 
         function getStarHTML(rating, size = 1) {
             let html = '';
-            // Arredonda para o meio mais próximo para considerar meia estrela
             const roundedRating = Math.round(rating * 2) / 2;
             for (let i = 1; i <= 5; i++) {
                 if (i <= roundedRating) {
@@ -735,22 +728,35 @@
             };
         }
         
+        // 🌟 FUNÇÃO DE CONFIGURAÇÃO DE EVENTOS DELEGADOS (MAIS ROBUSTA) 🌟
         function setupRatingInput() {
-            const stars = document.querySelectorAll('#rating-input i');
-            // ADICIONADO: console.log para debug. Se der 0, o HTML das estrelas não foi carregado
-            if(stars.length === 0) { console.warn("Estrelas de avaliação não encontradas. O sistema de clique não funcionará."); return; } 
+            const ratingInput = document.getElementById('rating-input');
+            
+            if (!ratingInput) {
+                console.warn("Elemento #rating-input não encontrado para configurar eventos.");
+                return; 
+            }
 
-            stars.forEach(star => {
-                star.addEventListener('click', () => {
+            // Delegação de evento de clique
+            ratingInput.addEventListener('click', (event) => {
+                const star = event.target.closest('i'); 
+                if (star && star.hasAttribute('data-rating')) {
                     currentRating = parseInt(star.getAttribute('data-rating'));
-                    highlightStars(currentRating); // ATUALIZA O VISUAL AO CLICAR
-                });
-                star.addEventListener('mouseover', () => {
+                    highlightStars(currentRating);
+                }
+            });
+
+            // Delegação de evento de mouseover (para visualização temporária)
+            ratingInput.addEventListener('mouseover', (event) => {
+                const star = event.target.closest('i');
+                if (star && star.hasAttribute('data-rating')) {
                     highlightStars(parseInt(star.getAttribute('data-rating')));
-                });
-                star.addEventListener('mouseout', () => {
-                    highlightStars(currentRating); // Volta para a nota selecionada (ou 0)
-                });
+                }
+            });
+
+            // Delegação de evento de mouseout (para voltar ao estado selecionado)
+            ratingInput.addEventListener('mouseout', () => {
+                highlightStars(currentRating);
             });
         }
 
@@ -769,15 +775,13 @@
         }
 
         function openProductDetail(id) {
-            // Verifica se o usuário está logado (para poder avaliar)
             if (!currentUser) return showToast("Faça login para ver os detalhes e avaliar.");
 
             const product = globalData.products.find(p => p.id === id);
             if (!product) return showToast("Produto não encontrado.");
             
-            // --- RESET E CARREGAMENTO DE DADOS ---
             currentProductId = id;
-            currentRating = 0; // Estado numérico resetado
+            currentRating = 0; 
             
             document.getElementById('modal-product-name').innerText = product.name;
             document.getElementById('modal-product-img').src = product.img || 'https://via.placeholder.com/300';
@@ -794,7 +798,6 @@
             const reviewFormArea = document.getElementById('review-form-area');
             const reviewStatus = document.getElementById('review-status');
 
-            // --- LÓGICA DE EXIBIÇÃO DO FORMULÁRIO DE AVALIAÇÃO ---
             if (existingReview) {
                 reviewFormArea.classList.add('hidden');
                 reviewStatus.style.color = 'var(--accent)';
@@ -804,11 +807,10 @@
                 reviewStatus.style.color = 'var(--danger)';
                 reviewStatus.innerText = "Você não pode avaliar seu próprio produto.";
             } else {
-                // Se puder avaliar:
                 reviewFormArea.classList.remove('hidden');
                 reviewStatus.innerText = '';
                 document.getElementById('review-comment').value = '';
-                highlightStars(0); // REFORÇADO: Garantir que as estrelas estão vazias (far)
+                highlightStars(0); // Garante que começa com 0 estrelas selecionadas
             }
 
             document.getElementById('product-detail-modal').classList.remove('hidden');
@@ -818,7 +820,6 @@
             document.getElementById('product-detail-modal').classList.add('hidden');
             currentProductId = null;
             currentRating = 0;
-            // Opcional: garantir que as estrelas no modal voltem ao estado zero
             highlightStars(0);
         }
 
@@ -880,31 +881,18 @@
         }
 
         /* --- FUNÇÕES DE NAVEGAÇÃO E UTILITÁRIOS --- */
-        
+        // ... (Todas as funções utilitárias permanecem inalteradas)
         function navTo(screen) {
-            // Esconde todas as seções de conteúdo
             ['view-shop','view-sell','view-profile','view-seller-profile'].forEach(id=>document.getElementById(id).classList.add('hidden'));
-            
-            // Remove o estado "ativo" de todos os botões de navegação
             document.querySelectorAll('.nav-menu button').forEach(b=>b.classList.remove('active'));
-            
-            // Mostra a seção desejada
             document.getElementById('view-'+screen).classList.remove('hidden');
-            
-            // Marca o botão de navegação como ativo
             if(screen==='shop') document.getElementById('btn-shop').classList.add('active');
             if(screen==='sell') document.getElementById('nav-btn-sell').classList.add('active');
-            
-            // Funções específicas ao navegar
             if(screen==='profile') {
                 document.querySelectorAll('.nav-menu button')[2].classList.add('active'); 
                 renderProfilePage();
             }
-            
-            // Fecha o menu mobile (se estiver aberto)
             document.querySelector('.nav-menu').classList.remove('mobile-open');
-            
-            // Esconde a busca se não estiver na loja
             if(screen!=='shop') document.getElementById('search-container').classList.add('hidden');
         }
 
@@ -929,7 +917,12 @@
         function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
         function copy(t) { if(!t) return showToast("Sem dado"); navigator.clipboard.writeText(t); showToast("Copiado"); }
 
-        init();
+
+        // 🌟 CHAMADA FINAL PARA GARANTIR QUE O DOM ESTEJA CARREGADO 🌟
+        document.addEventListener('DOMContentLoaded', () => {
+            setupRatingInput(); // Inicializa a lógica de eventos de clique nas estrelas
+            init(); // Inicia o resto da aplicação
+        });
     </script>
 </body>
 </html>
