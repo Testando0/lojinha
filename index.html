@@ -130,7 +130,7 @@
         }
         .toast.show { transform: translateY(0); }
 
-        /* --- MOBILE RESPONSIVO (CORREÇÃO FINAL DE ALINHAMENTO) --- */
+        /* --- MOBILE RESPONSIVO (CORREÇÃO FINAL DE ALINHAMENTO PERFEITO) --- */
         @media(max-width: 768px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
             
@@ -163,23 +163,23 @@
             .mobile-controls { 
                 display: flex; 
                 gap: 5px;
-                align-items: center;
+                align-items: center; /* Garante alinhamento vertical */
                 flex-shrink: 0;
             } 
 
-            /* Ícone de Pesquisa (Lupa): Corrigido para estar alinhado com o hambúrguer */
+            /* Ícone de Pesquisa (Lupa): ESTILO SINCORNIZADO para alinhamento perfeito */
             #btn-search-toggle { 
                 width: 45px; 
                 height: 45px;
                 padding: 0; 
                 border: 1px solid var(--border);
+                border-radius: 6px; /* EXPLICITAMENTE definido para igualar ao .mobile-toggle */
                 background: transparent;
                 display: flex; 
                 align-items: center;
                 justify-content: center;
                 font-size: 1.2rem;
-                /* --- CORREÇÃO APLICADA: REMOVE A MARGEM EXTRA --- */
-                margin-top: 0; 
+                margin-top: 0; /* REMOVIDA qualquer margem extra */
             }
             #btn-search-toggle span { display: none; } 
             
