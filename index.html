@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkMarket Online</title>
+    <style>
+        /* --- CSS IDENTICO AO ANTERIOR (TEMA DARK) --- */
+        :root { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --primary: #bb86fc; --secondary: #03dac6; --danger: #cf6679; --input-bg: #2d2d2d; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 50px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .hidden { display: none !important; }
+        button { cursor: pointer; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; margin-top: 5px; }
+        button:hover { opacity: 0.8; }
+        .btn-primary { background-color: var(--primary); color: #000; }
+        .btn-sec { background-color: var(--secondary); color: #000; }
+        .btn-danger { background-color: var(--danger); color: #fff; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; background-color: var(--input-bg); border: 1px solid #444; color: #fff; border-radius: 4px; }
+        
+        /* Header */
+        header { background-color: var(--card-bg); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; color: var(--primary); font-weight: bold; }
+        
+        /* Grid */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .product-card { background-color: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; }
+        .product-img { width: 100%; height: 200px; object-fit: cover; }
+        .product-info { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+        .price { color: var(--secondary); font-size: 1.2rem; font-weight: bold; }
+        .actions { margin-top: auto; display: flex; gap: 5px; }
+        .btn-whatsapp { background-color: #25D366; color: white; flex: 1; }
+        .btn-pix { background-color: #32BCAD; color: white; flex: 1; }
+
+        /* Loading overlay */
+        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); color: white; display: flex; justify-content: center; align-items: center; z-index: 999; font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+
+    <div id="loading" class="hidden">Carregando dados da Nuvem...</div>
+
+    <header>
+        <div class="logo">DarkMarket <span style="font-size:0.8rem; color:#777">(Online)</span></div>
+        <nav id="nav-menu" class="hidden">
+            <button onclick="renderScreen('shop')" class="btn-primary">Comprar</button>
+            <button onclick="renderScreen('sell')" class="btn-sec">Vender</button>
+            <button onclick="logout()" class="btn-danger">Sair</button>
+        </nav>
+    </header>
+
+    <div id="login-screen" class="container">
+        <div style="max-width:400px; margin:50px auto; background:var(--card-bg); padding:20px; border-radius:10px; text-align:center">
+            <h2>Entrar</h2>
+            <input type="text" id="l-user" placeholder="Usuário">
+            <input type="password" id="l-pass" placeholder="Senha">
+            <button onclick="doLogin()" class="btn-primary" style="width:100%">Login</button>
+            <p onclick="toggleAuth()" style="margin-top:10px; cursor:pointer; color:var(--secondary)">Criar conta</p>
+        </div>
+    </div>
+
+    <div id="register-screen" class="container hidden">
+        <div style="max-width:400px; margin:50px auto; background:var(--card-bg); padding:20px; border-radius:10px; text-align:center">
+            <h2>Cadastro</h2>
+            <input type="text" id="r-user" placeholder="Nome de Usuário">
+            <input type="password" id="r-pass" placeholder="Senha">
+            <input type="text" id="r-pix" placeholder="Sua Chave PIX">
+            <input type="text" id="r-wpp" placeholder="Seu WhatsApp (apenas números com DDD)">
+            <button onclick="doRegister()" class="btn-sec" style="width:100%">Cadastrar</button>
+            <p onclick="toggleAuth()" style="margin-top:10px; cursor:pointer; color:var(--secondary)">Voltar para Login</p>
+        </div>
+    </div>
+
+    <div id="shop-screen" class="container hidden">
+        <h2>Loja Global</h2>
+        <button onclick="loadDataCloud()" style="font-size:0.8rem; background:#333">↻ Atualizar Produtos</button>
+        <div id="products-list" class="products-grid"></div>
+    </div>
+
+    <div id="sell-screen" class="container hidden">
+        <h2>Anunciar Produto</h2>
+        <div style="background:var(--card-bg); padding:20px; border-radius:10px">
+            <input type="text" id="p-name" placeholder="Nome do Produto">
+            <input type="text" id="p-img" placeholder="Link da Imagem (URL)">
+            <input type="number" id="p-price" placeholder="Preço">
+            <textarea id="p-desc" placeholder="Descrição"></textarea>
+            <button onclick="postProduct()" class="btn-primary">Publicar Agora</button>
+        </div>
+    </div>
+
+    <script>
+        // ================= CONFIGURAÇÃO DA NUVEM (PREENCHIDO) =================
+        
+        const BIN_ID = '691ab4a143b1c97be9b262b4'; 
+        const API_KEY = '$2a$10$A5x.MiQYJZrXPO9rQ6OfXeOnX7Hvz2JMcb5ZJS78vGK8D3RJoVejy'; 
+        
+        // ======================================================================
+
+        const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        let globalData = { users: [], products: [] };
+        let currentUser = null;
+
+        // --- FUNÇÕES DE REDE (CONECTAR AO JSONBIN) ---
+
+        async function fetchData() {
+            document.getElementById('loading').classList.remove('hidden');
+            try {
+                const res = await fetch(URL + '/latest', {
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+                if(!res.ok) throw new Error("Erro ao conectar");
+                const json = await res.json();
+                globalData = json.record; // O jsonbin retorna os dados dentro de "record"
+            } catch (e) {
+                alert("Erro de conexão ou chaves erradas! Verifique o console.");
+                console.error(e);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        async function saveData() {
+            document.getElementById('loading').classList.remove('hidden');
+            try {
+                await fetch(URL, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY 
+                    },
+                    body: JSON.stringify(globalData)
+                });
+            } catch (e) {
+                alert("Erro ao salvar dados!");
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        // --- LÓGICA DO APP ---
+
+        function init() {
+            // Verifica se tem login salvo na sessão (local) apenas para manter logado
+            const savedUser = sessionStorage.getItem('darkUser');
+            if(savedUser) {
+                currentUser = JSON.parse(savedUser);
+                loadDataCloud(); // Carrega produtos ao iniciar
+                renderScreen('shop');
+                document.getElementById('nav-menu').classList.remove('hidden');
+            }
+        }
+
+        async function loadDataCloud() {
+            await fetchData();
+            renderProducts();
+        }
+
+        // Auth
+        async function doRegister() {
+            const user = document.getElementById('r-user').value;
+            const pass = document.getElementById('r-pass').value;
+            const pix = document.getElementById('r-pix').value;
+            const wpp = document.getElementById('r-wpp').value;
+
+            if(!user || !pass) return alert("Preencha tudo!");
+
+            await fetchData(); // Pega dados mais recentes antes de salvar
+            
+            if(globalData.users.find(u => u.user === user)) return alert("Usuário já existe");
+
+            globalData.users.push({ user, pass, pix, wpp });
+            await saveData();
+            
+            alert("Cadastrado! Faça login.");
+            toggleAuth();
+        }
+
+        async function doLogin() {
+            const user = document.getElementById('l-user').value;
+            const pass = document.getElementById('l-pass').value;
+
+            await fetchData();
+
+            const found = globalData.users.find(u => u.user === user && u.pass === pass);
+            if(found) {
+                currentUser = found;
+                sessionStorage.setItem('darkUser', JSON.stringify(found));
+                document.getElementById('nav-menu').classList.remove('hidden');
+                renderScreen('shop');
+            } else {
+                alert("Dados incorretos");
+            }
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.reload();
+        }
+
+        // Produtos
+        async function postProduct() {
+            if(!currentUser) return;
+            
+            const name = document.getElementById('p-name').value;
+            const img = document.getElementById('p-img').value;
+            const price = document.getElementById('p-price').value;
+            const desc = document.getElementById('p-desc').value;
+
+            if(!name || !price) return alert("Preencha nome e preço");
+
+            await fetchData(); // Atualiza para não sobrescrever vendas de outros
+
+            globalData.products.push({
+                id: Date.now(),
+                seller: currentUser.user,
+                pix: currentUser.pix,
+                wpp: currentUser.wpp,
+                name, img, price, desc
+            });
+
+            await saveData();
+            alert("Produto publicado na Nuvem!");
+            document.getElementById('p-name').value = "";
+            renderScreen('shop');
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('products-list');
+            container.innerHTML = '';
+
+            globalData.products.forEach(p => {
+                const wppLink = `https://wa.me/${p.wpp}?text=Olá, quero comprar o ${p.name}`;
+                
+                container.innerHTML += `
+                    <div class="product-card">
+                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="product-img">
+                        <div class="product-info">
+                            <small style="color:#888">Vendedor: ${p.seller}</small>
+                            <h3>${p.name}</h3>
+                            <p class="price">R$ ${p.price}</p>
+                            <p>${p.desc}</p>
+                            <div class="actions">
+                                <button class="btn-pix" onclick="prompt('Copie a chave PIX:', '${p.pix}')">Pix</button>
+                                <button class="btn-whatsapp" onclick="window.open('${wppLink}')">WhatsApp</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // UI
+        function renderScreen(screen) {
+            ['login-screen','register-screen','shop-screen','sell-screen'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(screen+'-screen').classList.remove('hidden');
+            if(screen === 'shop') renderProducts();
+        }
+
+        function toggleAuth() {
+            document.getElementById('login-screen').classList.toggle('hidden');
+            document.getElementById('register-screen').classList.toggle('hidden');
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
