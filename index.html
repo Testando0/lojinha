@@ -367,7 +367,7 @@
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
     </div>
 
 
@@ -379,14 +379,22 @@
         
         let globalData = { users: [], products: [] };
         let currentUser = null;
-        let currentProductId = null; // Mantido para referência ao produto no modal
+        let currentProductId = null;
 
         function init() {
             const session = localStorage.getItem('darkUserProMobile'); 
             if(session) {
-                currentUser = JSON.parse(session);
-                showApp();
-                loadData();
+                // Tenta carregar o usuário da sessão local
+                try {
+                    currentUser = JSON.parse(session);
+                    showApp();
+                    // Garante que os dados mais recentes sejam carregados após o login.
+                    loadData(); 
+                } catch(e) {
+                    // Limpa a sessão se for inválida, forçando novo login.
+                    localStorage.removeItem('darkUserProMobile');
+                    console.error("Sessão local inválida. Limpando.");
+                }
             }
         }
 
@@ -399,13 +407,20 @@
                 if(!res.ok) throw new Error();
                 const json = await res.json();
                 globalData = json.record;
+
+                // ATUALIZA O currentUser com os dados mais recentes do servidor
                 if(currentUser) {
                     const u = globalData.users.find(x => x.user === currentUser.user);
                     if(u) {
-                        currentUser = u;
+                        // Persiste o objeto completo e atualizado
+                        currentUser = u; 
                         if(!currentUser.role) currentUser.role = currentUser.pix ? 'seller' : 'buyer';
                         localStorage.setItem('darkUserProMobile', JSON.stringify(currentUser));
                         updateSidebarUI();
+                    } else {
+                         // Se o usuário não for encontrado no banco (ex: deletado)
+                        logout(); 
+                        return;
                     }
                 }
                 renderShop();
@@ -435,7 +450,8 @@
             const u = document.getElementById('l-user').value;
             const p = document.getElementById('l-pass').value;
             toggleLoader(true);
-            await loadData();
+            // Carrega os dados antes de tentar logar
+            await loadData(); 
             const found = globalData.users.find(x => x.user === u && x.pass === p);
             if(found) {
                 currentUser = found;
@@ -594,6 +610,7 @@
                 name: n, img: i, price: pr, desc: d,
                 sellerPix: currentUser.pix, 
                 sellerWpp: currentUser.wpp
+                // reviews: [] REMOVIDO
             });
 
             if(await saveData()) {
@@ -699,9 +716,14 @@
             const s = document.getElementById('search-container');
             navTo('shop');
             s.classList.toggle('hidden');
+            document.getElementById('search-term').focus(); // Adiciona foco para melhor usabilidade
         }
         function previewAvatar(url) { if(url) document.getElementById('prof-avatar-preview').src=url; }
-        function showApp() { document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('app-shell').classList.remove('hidden'); updateSidebarUI(); }
+        function showApp() { 
+            document.getElementById('auth-overlay').classList.add('hidden'); 
+            document.getElementById('app-shell').classList.remove('hidden'); 
+            updateSidebarUI(); 
+        }
         function updateSidebarUI() {
             document.getElementById('sb-name').innerText = currentUser.user;
             const btn = document.getElementById('nav-btn-sell');
