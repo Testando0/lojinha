@@ -137,12 +137,12 @@
             /* SIDEBAR NO MOBILE: Alinhamento central garantido */
             aside { 
                 width: 100%; 
-                height: 60px; /* Altura mantida para bom espaçamento */
+                height: 60px; 
                 flex-direction: row; 
                 justify-content: space-between; 
                 align-items: center; 
                 padding: 0 10px; 
-                border-bottom: 1px solid var(--border); /* Adicionando borda inferior */
+                border-bottom: 1px solid var(--border);
                 border-right: none;
             }
 
@@ -153,7 +153,7 @@
                 border: none; 
                 gap: 10px; 
                 align-items: center; 
-                flex-shrink: 1; /* Permite encolher um pouco, se necessário */
+                flex-shrink: 1;
             }
             .avatar-circle { width: 40px; height: 40px; margin: 0; } 
             .user-name { font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; } 
@@ -162,12 +162,12 @@
             /* Contêiner dos botões: Essencial para o alinhamento dos ícones */
             .mobile-controls { 
                 display: flex; 
-                gap: 5px; /* Espaçamento menor entre os botões */
+                gap: 5px;
                 align-items: center;
                 flex-shrink: 0;
             } 
 
-            /* Ícone de Pesquisa (Lupa): Ajuste para ser puramente um ícone centralizado */
+            /* Ícone de Pesquisa (Lupa): Corrigido para estar alinhado com o hambúrguer */
             #btn-search-toggle { 
                 width: 45px; 
                 height: 45px;
@@ -178,12 +178,12 @@
                 align-items: center;
                 justify-content: center;
                 font-size: 1.2rem;
-                /* --- CORREÇÃO APLICADA: Move para baixo 10px (aproximadamente 1cm) --- */
-                margin-top: 10px; 
+                /* --- CORREÇÃO APLICADA: REMOVE A MARGEM EXTRA --- */
+                margin-top: 0; 
             }
-            #btn-search-toggle span { display: none; } /* Oculta o texto "Pesquisar" */
+            #btn-search-toggle span { display: none; } 
             
-            /* Ícone de Menu Hambúrguer: Ajuste para ter o mesmo tamanho e centralização da lupa */
+            /* Ícone de Menu Hambúrguer: Mantido no mesmo tamanho da lupa */
             .mobile-toggle { 
                 width: 45px;
                 height: 45px;
