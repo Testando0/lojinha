@@ -3,245 +3,499 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedStore</title>
-    <style>
-        /* --- CSS IDENTICO AO ANTERIOR (TEMA DARK) --- */
-        :root { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --primary: #bb86fc; --secondary: #03dac6; --danger: #cf6679; --input-bg: #2d2d2d; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 50px; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .hidden { display: none !important; }
-        button { cursor: pointer; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; margin-top: 5px; }
-        button:hover { opacity: 0.8; }
-        .btn-primary { background-color: var(--primary); color: #000; }
-        .btn-sec { background-color: var(--secondary); color: #000; }
-        .btn-danger { background-color: var(--danger); color: #fff; }
-        input, textarea { width: 100%; padding: 10px; margin: 10px 0; background-color: var(--input-bg); border: 1px solid #444; color: #fff; border-radius: 4px; }
-        
-        /* Header */
-        header { background-color: var(--card-bg); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; color: var(--primary); font-weight: bold; }
-        
-        /* Grid */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
-        .product-card { background-color: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; }
-        .product-img { width: 100%; height: 200px; object-fit: cover; }
-        .product-info { padding: 15px; flex: 1; display: flex; flex-direction: column; }
-        .price { color: var(--secondary); font-size: 1.2rem; font-weight: bold; }
-        .actions { margin-top: auto; display: flex; gap: 5px; }
-        .btn-whatsapp { background-color: #25D366; color: white; flex: 1; }
-        .btn-pix { background-color: #32BCAD; color: white; flex: 1; }
+    <title>DarkMarket Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> <style>
+        :root {
+            --bg-body: #121212;
+            --bg-sidebar: #1a1a1a;
+            --bg-card: #252525;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --primary: #bb86fc;
+            --primary-hover: #9965f4;
+            --accent: #03dac6;
+            --danger: #cf6679;
+            --border: #333;
+        }
 
-        /* Loading overlay */
-        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); color: white; display: flex; justify-content: center; align-items: center; z-index: 999; font-size: 1.5rem; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; }
+        
+        body { background-color: var(--bg-body); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; }
+
+        /* --- UTILITÁRIOS --- */
+        .hidden { display: none !important; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary { background: var(--primary); color: #000; }
+        .btn-accent { background: var(--accent); color: #000; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        
+        input, textarea { 
+            width: 100%; padding: 12px; margin: 8px 0 15px; 
+            background: #1e1e1e; border: 1px solid var(--border); 
+            color: #fff; border-radius: 6px; outline: none;
+        }
+        input:focus, textarea:focus { border-color: var(--primary); }
+
+        /* --- LOGIN & CADASTRO (FULLSCREEN) --- */
+        #auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-body); z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .auth-box {
+            background: var(--bg-card); padding: 40px; border-radius: 12px;
+            width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center; border: 1px solid var(--border);
+        }
+        .auth-logo { font-size: 2rem; color: var(--primary); margin-bottom: 20px; font-weight: bold; letter-spacing: 1px; }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        /* Sidebar */
+        aside {
+            width: 260px; background: var(--bg-sidebar); height: 100%;
+            display: flex; flex-direction: column; border-right: 1px solid var(--border);
+            padding: 20px; transition: 0.3s;
+        }
+        
+        .user-mini-profile {
+            display: flex; flex-direction: column; align-items: center; margin-bottom: 30px;
+            padding-bottom: 20px; border-bottom: 1px solid var(--border);
+        }
+        .avatar-circle {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--primary); margin-bottom: 10px; background: #333;
+        }
+        .user-name { font-weight: bold; font-size: 1.1rem; }
+        .user-role { font-size: 0.85rem; color: var(--text-muted); }
+
+        .nav-menu button {
+            width: 100%; background: transparent; color: var(--text-muted);
+            text-align: left; padding: 12px; margin-bottom: 5px; border-radius: 6px;
+            display: flex; align-items: center; gap: 10px; font-size: 1rem;
+        }
+        .nav-menu button:hover, .nav-menu button.active {
+            background: rgba(187, 134, 252, 0.1); color: var(--primary);
+        }
+        .nav-menu button i { width: 20px; text-align: center; }
+
+        /* Conteúdo Principal */
+        main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        
+        h2 { font-size: 1.8rem; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        /* Grid de Produtos */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card { 
+            background: var(--bg-card); border-radius: 10px; overflow: hidden; 
+            border: 1px solid var(--border); transition: transform 0.2s; display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .card-img { width: 100%; height: 180px; object-fit: cover; background: #333; }
+        .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+        .card-price { color: var(--accent); font-size: 1.2rem; font-weight: bold; margin: 5px 0; }
+        .card-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; flex: 1; }
+        .card-actions { display: flex; gap: 10px; margin-top: auto; }
+        
+        /* Página de Perfil */
+        .profile-header { background: var(--bg-card); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border); display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .profile-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+
+        /* Loading e Toasts */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: transparent; z-index: 2000; }
+        #loader.active { background: linear-gradient(90deg, var(--primary), var(--accent)); animation: load 1s infinite; }
+        @keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        .toast { 
+            position: fixed; bottom: 20px; right: 20px; 
+            background: var(--primary); color: #000; padding: 15px 25px; 
+            border-radius: 5px; font-weight: bold; transform: translateY(100px); 
+            transition: 0.3s; z-index: 3000;
+        }
+        .toast.show { transform: translateY(0); }
+
+        /* Mobile Responsivo */
+        @media(max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow-y: auto; }
+            aside { width: 100%; height: auto; flex-direction: row; justify-content: space-between; align-items: center; padding: 10px; }
+            .user-mini-profile { flex-direction: row; margin: 0; padding: 0; border: none; gap: 10px; }
+            .avatar-circle { width: 40px; height: 40px; margin: 0; }
+            .user-role { display: none; }
+            .nav-menu { display: none; position: absolute; top: 60px; left:0; width:100%; background: var(--bg-sidebar); padding: 10px; z-index: 999; }
+            .nav-menu.mobile-open { display: block; }
+            .mobile-toggle { display: block; font-size: 1.5rem; cursor: pointer; }
+            .profile-form { grid-template-columns: 1fr; }
+        }
+        @media(min-width: 769px) { .mobile-toggle { display: none; } }
+
     </style>
 </head>
 <body>
 
-    <div id="loading" class="hidden">Carregando dados da Nuvem...</div>
+    <div id="loader"></div>
+    <div id="toast" class="toast">Notificação</div>
 
-    <header>
-        <div class="logo">RedStore <span style="font-size:0.8rem; color:#777">(Online)</span></div>
-        <nav id="nav-menu" class="hidden">
-            <button onclick="renderScreen('shop')" class="btn-primary">Comprar</button>
-            <button onclick="renderScreen('sell')" class="btn-sec">Vender</button>
-            <button onclick="logout()" class="btn-danger">Sair</button>
-        </nav>
-    </header>
-
-    <div id="login-screen" class="container">
-        <div style="max-width:400px; margin:50px auto; background:var(--card-bg); padding:20px; border-radius:10px; text-align:center">
-            <h2>Entrar</h2>
+    <div id="auth-overlay">
+        <div id="login-box" class="auth-box">
+            <div class="auth-logo"><i class="fas fa-shopping-bag"></i> DarkMarket</div>
+            <h3>Bem-vindo de volta</h3>
             <input type="text" id="l-user" placeholder="Usuário">
             <input type="password" id="l-pass" placeholder="Senha">
-            <button onclick="doLogin()" class="btn-primary" style="width:100%">Login</button>
-            <p onclick="toggleAuth()" style="margin-top:10px; cursor:pointer; color:var(--secondary)">Criar conta</p>
+            <button onclick="doLogin()" class="btn btn-primary" style="width:100%; justify-content:center">Entrar na Conta</button>
+            <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem">
+                Não tem conta? <a href="#" onclick="toggleAuth()" style="color:var(--accent)">Cadastre-se</a>
+            </p>
+        </div>
+
+        <div id="register-box" class="auth-box hidden">
+            <div class="auth-logo"><i class="fas fa-user-plus"></i> Criar Conta</div>
+            <input type="text" id="r-user" placeholder="Escolha um usuário">
+            <input type="password" id="r-pass" placeholder="Crie uma senha">
+            <input type="text" id="r-pix" placeholder="Chave PIX (para receber)">
+            <input type="text" id="r-wpp" placeholder="WhatsApp (com DDD)">
+            <button onclick="doRegister()" class="btn btn-accent" style="width:100%; justify-content:center">Criar Conta</button>
+            <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem">
+                Já tem conta? <a href="#" onclick="toggleAuth()" style="color:var(--primary)">Fazer Login</a>
+            </p>
         </div>
     </div>
 
-    <div id="register-screen" class="container hidden">
-        <div style="max-width:400px; margin:50px auto; background:var(--card-bg); padding:20px; border-radius:10px; text-align:center">
-            <h2>Cadastro</h2>
-            <input type="text" id="r-user" placeholder="Nome de Usuário">
-            <input type="password" id="r-pass" placeholder="Senha">
-            <input type="text" id="r-pix" placeholder="Sua Chave PIX">
-            <input type="text" id="r-wpp" placeholder="Seu WhatsApp (apenas números com DDD)">
-            <button onclick="doRegister()" class="btn-sec" style="width:100%">Cadastrar</button>
-            <p onclick="toggleAuth()" style="margin-top:10px; cursor:pointer; color:var(--secondary)">Voltar para Login</p>
-        </div>
-    </div>
+    <div id="app-shell" class="hidden" style="display:contents">
+        
+        <aside>
+            <div class="user-mini-profile">
+                <img id="sb-avatar" src="https://via.placeholder.com/100" class="avatar-circle">
+                <div class="user-name" id="sb-name">Usuário</div>
+                <div class="user-role">Vendedor Verificado</div>
+            </div>
+            
+            <div class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></div>
 
-    <div id="shop-screen" class="container hidden">
-        <h2>Loja Global</h2>
-        <button onclick="loadDataCloud()" style="font-size:0.8rem; background:#333">↻ Atualizar Produtos</button>
-        <div id="products-list" class="products-grid"></div>
-    </div>
+            <nav class="nav-menu" id="nav-menu">
+                <button onclick="navTo('shop')" id="btn-shop" class="active"><i class="fas fa-store"></i> Loja Global</button>
+                <button onclick="navTo('sell')"><i class="fas fa-plus-circle"></i> Anunciar Produto</button>
+                <button onclick="navTo('profile')"><i class="fas fa-user-cog"></i> Meu Perfil</button>
+                <div style="flex:1"></div> <button onclick="logout()" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </nav>
+        </aside>
 
-    <div id="sell-screen" class="container hidden">
-        <h2>Anunciar Produto</h2>
-        <div style="background:var(--card-bg); padding:20px; border-radius:10px">
-            <input type="text" id="p-name" placeholder="Nome do Produto">
-            <input type="text" id="p-img" placeholder="Link da Imagem (URL)">
-            <input type="number" id="p-price" placeholder="Preço">
-            <textarea id="p-desc" placeholder="Descrição"></textarea>
-            <button onclick="postProduct()" class="btn-primary">Publicar Agora</button>
-        </div>
+        <main>
+            
+            <section id="view-shop">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2>Loja Global</h2>
+                    <button onclick="loadData()" class="btn btn-ghost"><i class="fas fa-sync"></i> Atualizar</button>
+                </div>
+                <div id="products-grid" class="grid">
+                    </div>
+            </section>
+
+            <section id="view-sell" class="hidden">
+                <h2>Anunciar Produto</h2>
+                <div style="background:var(--bg-card); padding:20px; border-radius:10px; border:1px solid var(--border); max-width:600px">
+                    <label>Nome do Produto</label>
+                    <input type="text" id="p-name" placeholder="Ex: iPhone 12 Usado">
+                    
+                    <label>Imagem (URL)</label>
+                    <input type="text" id="p-img" placeholder="http://...">
+                    
+                    <label>Preço (R$)</label>
+                    <input type="number" id="p-price" placeholder="0.00">
+                    
+                    <label>Descrição</label>
+                    <textarea id="p-desc" rows="4" placeholder="Detalhes do produto..."></textarea>
+                    
+                    <button onclick="postProduct()" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Publicar Anúncio</button>
+                </div>
+            </section>
+
+            <section id="view-profile" class="hidden">
+                <h2>Meu Perfil</h2>
+                
+                <div class="profile-header">
+                    <img id="prof-avatar-preview" src="" class="avatar-circle" style="width:100px; height:100px;">
+                    <div style="flex:1">
+                        <h3>Editar Informações</h3>
+                        <div class="profile-form">
+                            <input type="text" id="edit-avatar" placeholder="URL da Foto de Perfil" onchange="previewAvatar(this.value)">
+                            <input type="text" id="edit-user" placeholder="Nome de Usuário (Display)" readonly style="opacity:0.5; cursor:not-allowed" title="Nome de usuário não pode ser alterado">
+                            <input type="text" id="edit-pix" placeholder="Chave PIX">
+                            <input type="text" id="edit-wpp" placeholder="WhatsApp">
+                            <textarea id="edit-bio" class="full-width" placeholder="Escreva uma breve biografia sobre você ou sua loja..."></textarea>
+                        </div>
+                        <button onclick="updateProfile()" class="btn btn-accent"><i class="fas fa-save"></i> Salvar Alterações</button>
+                    </div>
+                </div>
+
+                <h3 style="margin-top:40px; border-bottom:1px solid var(--border); padding-bottom:10px">Meus Anúncios Ativos</h3>
+                <div id="my-products-grid" class="grid" style="margin-top:20px">
+                    </div>
+            </section>
+
+        </main>
     </div>
 
     <script>
-        // ================= CONFIGURAÇÃO DA NUVEM (PREENCHIDO) =================
-        
+        // ================= CONFIGURAÇÃO =================
         const BIN_ID = '691ab4a143b1c97be9b262b4'; 
         const API_KEY = '$2a$10$A5x.MiQYJZrXPO9rQ6OfXeOnX7Hvz2JMcb5ZJS78vGK8D3RJoVejy'; 
-        
-        // ======================================================================
-
         const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        
         let globalData = { users: [], products: [] };
         let currentUser = null;
 
-        // --- FUNÇÕES DE REDE (CONECTAR AO JSONBIN) ---
+        // --- INICIALIZAÇÃO ---
+        function init() {
+            const session = sessionStorage.getItem('darkUserPro');
+            if(session) {
+                currentUser = JSON.parse(session);
+                showApp();
+                loadData();
+            }
+        }
 
-        async function fetchData() {
-            document.getElementById('loading').classList.remove('hidden');
+        // --- CONEXÃO ---
+        async function loadData() {
+            toggleLoader(true);
             try {
-                const res = await fetch(URL + '/latest', {
-                    headers: { 'X-Master-Key': API_KEY }
-                });
-                if(!res.ok) throw new Error("Erro ao conectar");
+                const res = await fetch(URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+                if(!res.ok) throw new Error();
                 const json = await res.json();
-                globalData = json.record; // O jsonbin retorna os dados dentro de "record"
+                globalData = json.record;
+                
+                // Atualizar dados do usuário atual se ele estiver logado (caso tenha mudado em outro PC)
+                if(currentUser) {
+                    const updatedUser = globalData.users.find(u => u.user === currentUser.user);
+                    if(updatedUser) {
+                        currentUser = updatedUser;
+                        sessionStorage.setItem('darkUserPro', JSON.stringify(currentUser));
+                        updateSidebarUI();
+                    }
+                }
+
+                renderShop();
+                if(!document.getElementById('view-profile').classList.contains('hidden')) renderProfilePage();
+                
             } catch (e) {
-                alert("Erro de conexão ou chaves erradas! Verifique o console.");
-                console.error(e);
+                showToast("Erro de conexão.");
             } finally {
-                document.getElementById('loading').classList.add('hidden');
+                toggleLoader(false);
             }
         }
 
         async function saveData() {
-            document.getElementById('loading').classList.remove('hidden');
+            toggleLoader(true);
             try {
                 await fetch(URL, {
                     method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
                     body: JSON.stringify(globalData)
                 });
+                return true;
             } catch (e) {
-                alert("Erro ao salvar dados!");
+                showToast("Erro ao salvar.");
+                return false;
             } finally {
-                document.getElementById('loading').classList.add('hidden');
+                toggleLoader(false);
             }
         }
 
-        // --- LÓGICA DO APP ---
+        // --- AUTENTICAÇÃO ---
+        async function doLogin() {
+            const user = document.getElementById('l-user').value;
+            const pass = document.getElementById('l-pass').value;
+            
+            toggleLoader(true);
+            await loadData(); // Garante dados frescos
 
-        function init() {
-            // Verifica se tem login salvo na sessão (local) apenas para manter logado
-            const savedUser = sessionStorage.getItem('darkUser');
-            if(savedUser) {
-                currentUser = JSON.parse(savedUser);
-                loadDataCloud(); // Carrega produtos ao iniciar
-                renderScreen('shop');
-                document.getElementById('nav-menu').classList.remove('hidden');
+            const found = globalData.users.find(u => u.user === user && u.pass === pass);
+            
+            if(found) {
+                currentUser = found;
+                sessionStorage.setItem('darkUserPro', JSON.stringify(found));
+                showApp();
+                showToast(`Bem-vindo, ${found.user}!`);
+            } else {
+                showToast("Usuário ou senha incorretos.");
             }
+            toggleLoader(false);
         }
 
-        async function loadDataCloud() {
-            await fetchData();
-            renderProducts();
-        }
-
-        // Auth
         async function doRegister() {
             const user = document.getElementById('r-user').value;
             const pass = document.getElementById('r-pass').value;
             const pix = document.getElementById('r-pix').value;
             const wpp = document.getElementById('r-wpp').value;
 
-            if(!user || !pass) return alert("Preencha tudo!");
+            if(!user || !pass) return showToast("Preencha os campos obrigatórios");
 
-            await fetchData(); // Pega dados mais recentes antes de salvar
+            toggleLoader(true);
+            await loadData();
+
+            if(globalData.users.find(u => u.user === user)) {
+                toggleLoader(false);
+                return showToast("Usuário já existe!");
+            }
+
+            // Novo usuário com campos extras de perfil
+            const newUser = { 
+                user, pass, pix, wpp,
+                avatar: 'https://ui-avatars.com/api/?name='+user+'&background=bb86fc&color=fff',
+                bio: 'Vendedor novo no DarkMarket.'
+            };
+
+            globalData.users.push(newUser);
             
-            if(globalData.users.find(u => u.user === user)) return alert("Usuário já existe");
-
-            globalData.users.push({ user, pass, pix, wpp });
-            await saveData();
-            
-            alert("Cadastrado! Faça login.");
-            toggleAuth();
-        }
-
-        async function doLogin() {
-            const user = document.getElementById('l-user').value;
-            const pass = document.getElementById('l-pass').value;
-
-            await fetchData();
-
-            const found = globalData.users.find(u => u.user === user && u.pass === pass);
-            if(found) {
-                currentUser = found;
-                sessionStorage.setItem('darkUser', JSON.stringify(found));
-                document.getElementById('nav-menu').classList.remove('hidden');
-                renderScreen('shop');
-            } else {
-                alert("Dados incorretos");
+            if(await saveData()) {
+                showToast("Conta criada! Faça login.");
+                toggleAuth();
             }
         }
 
         function logout() {
-            sessionStorage.clear();
+            sessionStorage.removeItem('darkUserPro');
             window.location.reload();
         }
 
-        // Produtos
+        // --- PERFIL E ATUALIZAÇÃO ---
+        async function updateProfile() {
+            const newAvatar = document.getElementById('edit-avatar').value;
+            const newPix = document.getElementById('edit-pix').value;
+            const newWpp = document.getElementById('edit-wpp').value;
+            const newBio = document.getElementById('edit-bio').value;
+
+            toggleLoader(true);
+            await loadData(); // Atualiza antes de editar
+
+            // Encontra índice do usuário
+            const index = globalData.users.findIndex(u => u.user === currentUser.user);
+            if(index !== -1) {
+                // Atualiza objeto na memória
+                globalData.users[index].avatar = newAvatar || globalData.users[index].avatar;
+                globalData.users[index].pix = newPix;
+                globalData.users[index].wpp = newWpp;
+                globalData.users[index].bio = newBio;
+
+                // Salva na nuvem
+                if(await saveData()) {
+                    currentUser = globalData.users[index]; // Atualiza sessão local
+                    sessionStorage.setItem('darkUserPro', JSON.stringify(currentUser));
+                    updateSidebarUI();
+                    showToast("Perfil atualizado com sucesso!");
+                }
+            }
+        }
+
+        function renderProfilePage() {
+            // Preenche formulário
+            document.getElementById('edit-user').value = currentUser.user;
+            document.getElementById('edit-pix').value = currentUser.pix;
+            document.getElementById('edit-wpp').value = currentUser.wpp;
+            document.getElementById('edit-bio').value = currentUser.bio || '';
+            document.getElementById('edit-avatar').value = currentUser.avatar || '';
+            document.getElementById('prof-avatar-preview').src = currentUser.avatar;
+
+            // Renderiza Meus Produtos
+            const myGrid = document.getElementById('my-products-grid');
+            myGrid.innerHTML = '';
+            const myProds = globalData.products.filter(p => p.seller === currentUser.user);
+
+            if(myProds.length === 0) myGrid.innerHTML = '<p style="color:#777">Você não tem produtos à venda.</p>';
+
+            myProds.forEach(p => {
+                myGrid.innerHTML += `
+                    <div class="card">
+                        <img src="${p.img}" class="card-img">
+                        <div class="card-body">
+                            <h4>${p.name}</h4>
+                            <p class="card-price">R$ ${p.price}</p>
+                            <button onclick="deleteProduct(${p.id})" class="btn btn-danger" style="margin-top:auto; width:100%; justify-content:center"><i class="fas fa-trash"></i> Excluir</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function previewAvatar(url) {
+            if(url) document.getElementById('prof-avatar-preview').src = url;
+        }
+
+        // --- PRODUTOS ---
         async function postProduct() {
-            if(!currentUser) return;
-            
             const name = document.getElementById('p-name').value;
             const img = document.getElementById('p-img').value;
             const price = document.getElementById('p-price').value;
             const desc = document.getElementById('p-desc').value;
 
-            if(!name || !price) return alert("Preencha nome e preço");
+            if(!name || !price) return showToast("Nome e preço obrigatórios");
 
-            await fetchData(); // Atualiza para não sobrescrever vendas de outros
+            toggleLoader(true);
+            await loadData();
 
             globalData.products.push({
                 id: Date.now(),
                 seller: currentUser.user,
-                pix: currentUser.pix,
-                wpp: currentUser.wpp,
-                name, img, price, desc
+                name, img, price, desc,
+                // Dados de contato são pegos dinamicamente do usuário atual na hora da renderização da loja, 
+                // mas salvamos aqui para histórico simples
+                sellerPix: currentUser.pix, 
+                sellerWpp: currentUser.wpp
             });
 
-            await saveData();
-            alert("Produto publicado na Nuvem!");
-            document.getElementById('p-name').value = "";
-            renderScreen('shop');
+            if(await saveData()) {
+                showToast("Produto anunciado!");
+                document.getElementById('p-name').value = "";
+                document.getElementById('p-desc').value = "";
+                navTo('shop');
+            }
         }
 
-        function renderProducts() {
-            const container = document.getElementById('products-list');
-            container.innerHTML = '';
+        async function deleteProduct(id) {
+            if(!confirm("Tem certeza que deseja excluir este anúncio?")) return;
+            
+            toggleLoader(true);
+            await loadData();
+            
+            globalData.products = globalData.products.filter(p => p.id !== id);
+            
+            if(await saveData()) {
+                showToast("Produto excluído.");
+                renderProfilePage();
+            }
+        }
 
-            globalData.products.forEach(p => {
-                const wppLink = `https://wa.me/${p.wpp}?text=Olá, quero comprar o ${p.name}`;
-                
-                container.innerHTML += `
-                    <div class="product-card">
-                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="product-img">
-                        <div class="product-info">
-                            <small style="color:#888">Vendedor: ${p.seller}</small>
+        function renderShop() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            
+            // Ordenar: mais novos primeiro
+            const sortedProds = [...globalData.products].reverse();
+
+            sortedProds.forEach(p => {
+                // Tenta achar dados atualizados do vendedor (foto, pix atualizado)
+                const sellerData = globalData.users.find(u => u.user === p.seller) || {};
+                const sellerAvatar = sellerData.avatar || 'https://via.placeholder.com/30';
+                const currentWpp = sellerData.wpp || p.sellerWpp;
+                const currentPix = sellerData.pix || p.sellerPix;
+
+                const wppLink = `https://wa.me/${currentWpp}?text=Olá, vi seu anúncio do ${p.name} no DarkMarket.`;
+
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="card-img">
+                        <div class="card-body">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+                                <img src="${sellerAvatar}" style="width:30px; height:30px; border-radius:50%">
+                                <small style="color:var(--text-muted)">${p.seller}</small>
+                            </div>
                             <h3>${p.name}</h3>
-                            <p class="price">R$ ${p.price}</p>
-                            <p>${p.desc}</p>
-                            <div class="actions">
-                                <button class="btn-pix" onclick="prompt('Copie a chave PIX:', '${p.pix}')">Pix</button>
-                                <button class="btn-whatsapp" onclick="window.open('${wppLink}')">WhatsApp</button>
+                            <p class="card-price">R$ ${p.price}</p>
+                            <p class="card-desc">${p.desc}</p>
+                            <div class="card-actions">
+                                <button onclick="copyText('${currentPix}')" class="btn btn-primary" style="flex:1"><i class="fas fa-qrcode"></i> Pix</button>
+                                <button onclick="window.open('${wppLink}')" class="btn btn-accent" style="flex:1"><i class="fab fa-whatsapp"></i> Wpp</button>
                             </div>
                         </div>
                     </div>
@@ -249,20 +503,68 @@
             });
         }
 
-        // UI
-        function renderScreen(screen) {
-            ['login-screen','register-screen','shop-screen','sell-screen'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById(screen+'-screen').classList.remove('hidden');
-            if(screen === 'shop') renderProducts();
+        // --- UI HELPERS ---
+        function showApp() {
+            document.getElementById('auth-overlay').classList.add('hidden');
+            document.getElementById('app-shell').classList.remove('hidden');
+            updateSidebarUI();
+        }
+
+        function updateSidebarUI() {
+            document.getElementById('sb-name').innerText = currentUser.user;
+            if(currentUser.avatar) document.getElementById('sb-avatar').src = currentUser.avatar;
+        }
+
+        function navTo(screen) {
+            // Esconde todas as seções
+            ['view-shop', 'view-sell', 'view-profile'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            // Remove classe active dos botões
+            document.querySelectorAll('.nav-menu button').forEach(b => b.classList.remove('active'));
+            
+            // Mostra a escolhida
+            document.getElementById('view-'+screen).classList.remove('hidden');
+            
+            // Ativa botão correspondente
+            const btnMap = { 'shop': 0, 'sell': 1, 'profile': 2 };
+            // Simplesmente adiciona active visualmente se quiser ser específico, ou usa o index
+            
+            if(screen === 'shop') { renderShop(); }
+            if(screen === 'profile') { renderProfilePage(); }
+            
+            // Fecha menu mobile se estiver aberto
+            document.querySelector('.nav-menu').classList.remove('mobile-open');
         }
 
         function toggleAuth() {
-            document.getElementById('login-screen').classList.toggle('hidden');
-            document.getElementById('register-screen').classList.toggle('hidden');
+            document.getElementById('login-box').classList.toggle('hidden');
+            document.getElementById('register-box').classList.toggle('hidden');
         }
 
-        init();
+        function toggleMobileMenu() {
+            document.querySelector('.nav-menu').classList.toggle('mobile-open');
+        }
 
+        function toggleLoader(show) {
+            const l = document.getElementById('loader');
+            if(show) l.classList.add('active');
+            else l.classList.remove('active');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            showToast("Copiado para área de transferência!");
+        }
+
+        // Iniciar
+        init();
     </script>
 </body>
 </html>
+
