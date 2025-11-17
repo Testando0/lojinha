@@ -3,257 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkMarket Painel</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>DarkMarket Painel V3</title>
     <style>
-        /* --- CSS TEMA DARK --- */
-        :root { 
-            --bg-color: #121212; 
-            --sidebar-bg: #1a1a1a;
-            --card-bg: #1e1e1e; 
-            --text-color: #e0e0e0; 
-            --primary: #bb86fc; 
-            --secondary: #03dac6; 
-            --danger: #cf6679; 
-            --input-bg: #2d2d2d; 
-            --star: #ffd700; 
+        /* --- RESET E VARIAVEIS --- */
+        :root {
+            --bg-body: #121212;
+            --bg-sidebar: #000000;
+            --bg-card: #1e1e1e;
+            --bg-input: #2d2d2d;
+            --primary: #bb86fc;
+            --secondary: #03dac6;
+            --text: #e0e0e0;
+            --danger: #ff5555;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; overflow: hidden; display: flex; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; outline: none; }
         
-        /* LAYOUT DASHBOARD */
-        .app-container { display: flex; width: 100%; height: 100%; }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text);
+            height: 100vh; /* Ocupa toda a altura da tela */
+            overflow: hidden; /* Impede rolagem na pagina inteira */
+        }
+
+        /* --- UTILITARIOS --- */
+        .hidden { display: none !important; }
         
+        button { cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; }
+        button:hover { opacity: 0.8; }
+        
+        .btn-fill { background: var(--primary); color: #000; padding: 10px 20px; }
+        .btn-outline { background: transparent; border: 1px solid var(--secondary); color: var(--secondary); padding: 5px 10px; }
+        
+        input, textarea, select {
+            width: 100%; padding: 12px; margin: 8px 0;
+            background: var(--bg-input); border: 1px solid #444; color: white; border-radius: 5px;
+        }
+
+        /* --- LAYOUT GERAL (DASHBOARD) --- */
+        #app-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
         /* SIDEBAR (MENU LATERAL) */
         .sidebar {
-            width: 250px;
-            background-color: var(--sidebar-bg);
+            width: 260px;
+            background: var(--bg-sidebar);
             border-right: 1px solid #333;
             display: flex;
             flex-direction: column;
             padding: 20px;
-            transition: 0.3s;
+            flex-shrink: 0; /* Não deixa o menu encolher */
         }
-        .logo { font-size: 1.5rem; color: var(--primary); font-weight: bold; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
-        .menu-items { flex: 1; display: flex; flex-direction: column; gap: 10px; }
         
-        .menu-btn {
+        .brand { font-size: 1.4rem; color: var(--primary); font-weight: bold; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        
+        .nav-btn {
             background: transparent;
-            border: none;
             color: #aaa;
+            padding: 15px;
             text-align: left;
-            padding: 12px 15px;
-            border-radius: 8px;
             font-size: 1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: 0.2s;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .menu-btn:hover, .menu-btn.active { background: rgba(187, 134, 252, 0.1); color: var(--primary); }
-        .menu-btn i { width: 20px; text-align: center; }
+        .nav-btn:hover, .nav-btn.active { background: #222; color: var(--primary); }
 
-        /* ÁREA PRINCIPAL */
+        /* CONTEUDO PRINCIPAL */
         .main-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            position: relative;
+            flex: 1; /* Ocupa o resto da tela */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Importante para o scroll interno */
         }
 
-        /* BARRA DE PESQUISA */
-        .top-bar {
+        /* TOPO (LUPA) */
+        .top-header {
+            padding: 15px 20px;
+            background: var(--bg-card);
+            border-bottom: 1px solid #333;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #333;
         }
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: var(--input-bg);
-            border-radius: 20px;
-            padding: 5px 15px;
-            width: 300px;
-            border: 1px solid #444;
+        .search-wrapper {
+            display: flex; align-items: center; background: var(--bg-input);
+            border-radius: 20px; padding: 0 15px; width: 400px; border: 1px solid #444;
         }
-        .search-box input {
-            border: none;
-            background: transparent;
-            outline: none;
-            color: white;
-            margin: 0;
-            padding: 8px;
+        .search-wrapper input { border: none; background: transparent; margin: 0; padding: 10px; }
+
+        /* AREA DE SCROLL DOS PRODUTOS */
+        .scroll-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto; /* Barra de rolagem apenas aqui */
         }
-        .search-box i { color: #888; }
 
-        /* ELEMENTOS GERAIS */
-        .hidden { display: none !important; }
-        button.action-btn { cursor: pointer; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; }
-        button.action-btn:hover { opacity: 0.8; }
-        .btn-primary { background-color: var(--primary); color: #000; }
-        .btn-sec { background-color: var(--secondary); color: #000; }
-        .btn-danger { background-color: var(--danger); color: #fff; }
+        /* CARDS DE PRODUTO */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        
+        .card {
+            background: var(--bg-card); border: 1px solid #333;
+            border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;
+        }
+        .card img { width: 100%; height: 180px; object-fit: cover; cursor: pointer; }
+        .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+        .price-tag { font-size: 1.2rem; color: var(--secondary); font-weight: bold; margin: 5px 0; }
 
-        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; background-color: var(--input-bg); border: 1px solid #444; color: #fff; border-radius: 4px; }
-
-        /* GRID PRODUTOS */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .product-card { background-color: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; transition: transform 0.2s; }
-        .product-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .product-img { width: 100%; height: 180px; object-fit: cover; cursor: pointer; }
-        .product-info { padding: 15px; flex: 1; display: flex; flex-direction: column; }
-        .price { color: var(--secondary); font-size: 1.2rem; font-weight: bold; margin: 5px 0; }
-        .rating-badge { background: #333; color: var(--star); padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; display: inline-block; margin-bottom: 5px;}
-
-        /* AUTH SCREENS (Centralizadas) */
-        .auth-container {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: var(--bg-color); z-index: 200;
+        /* --- TELAS DE LOGIN (OVERLAY) --- */
+        #auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 999;
             display: flex; justify-content: center; align-items: center;
         }
-        .auth-box { width: 100%; max-width: 400px; background: var(--card-bg); padding: 30px; border-radius: 10px; border: 1px solid #333; }
+        .auth-box { width: 100%; max-width: 380px; background: var(--bg-card); padding: 30px; border-radius: 10px; border: 1px solid var(--primary); }
 
-        /* MODAL */
-        #modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 300; overflow-y: auto; padding: 20px; display: flex; justify-content: center; align-items: start; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--card-bg); padding: 20px; border-radius: 10px; max-width: 600px; width: 100%; margin-top: 50px; position: relative; border: 1px solid var(--primary); }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: var(--danger); }
-        .review-box { background: #252525; padding: 10px; margin-top: 10px; border-radius: 5px; border-left: 3px solid var(--secondary); }
-        
-        /* Loading */
-        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); color: white; display: flex; justify-content: center; align-items: center; z-index: 999; font-size: 1.5rem; }
+        /* --- MODAL --- */
+        #modal-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000;
+            display: flex; justify-content: center; align-items: flex-start;
+            overflow-y: auto; padding: 20px; backdrop-filter: blur(4px);
+        }
+        .modal-body {
+            background: var(--bg-card); width: 100%; max-width: 600px;
+            padding: 20px; border-radius: 10px; border: 1px solid #555; margin-top: 40px; position: relative;
+        }
 
-        /* Responsivo */
-        @media (max-width: 768px) {
-            body { flex-direction: column; overflow: auto; }
-            .sidebar { width: 100%; flex-direction: row; align-items: center; padding: 10px; height: auto; }
-            .menu-items { flex-direction: row; overflow-x: auto; }
-            .logo { margin-bottom: 0; margin-right: 20px; font-size: 1.2rem; }
-            .menu-btn span { display: none; } /* Esconde texto no mobile, mostra só ícone */
+        /* RESPONSIVO MOBILE */
+        @media(max-width: 768px) {
+            #app-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; align-items: center; padding: 10px; }
+            .nav-btn { padding: 8px; font-size: 0.9rem; }
+            .brand { margin: 0; font-size: 1rem; margin-right: 10px;}
+            .search-wrapper { width: 150px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loading" class="hidden">Conectando à Nuvem...</div>
+    <div id="loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:white; display:flex; justify-content:center; align-items:center; z-index:2000;" class="hidden">
+        Carregando...
+    </div>
 
-    <div id="auth-layer" class="auth-container">
-        
-        <div id="login-screen" class="auth-box">
-            <h2 style="text-align:center; color:var(--primary); margin-bottom:20px">DarkMarket Login</h2>
+    <div id="auth-overlay">
+        <div id="login-box" class="auth-box">
+            <h2 style="text-align:center; color:var(--primary)">Entrar</h2>
             <input type="text" id="l-user" placeholder="Usuário">
             <input type="password" id="l-pass" placeholder="Senha">
-            <button onclick="doLogin()" class="action-btn btn-primary" style="width:100%; margin-top:10px">Entrar</button>
-            <p onclick="toggleAuth()" style="margin-top:15px; cursor:pointer; color:var(--secondary); text-align:center">Não tem conta? Cadastre-se</p>
+            <button onclick="doLogin()" class="btn-fill" style="width:100%; margin-top:10px">Login</button>
+            <p onclick="toggleAuthScreens()" style="text-align:center; margin-top:15px; color:var(--secondary); cursor:pointer">Criar conta</p>
         </div>
 
-        <div id="register-screen" class="auth-box hidden">
-            <h2 style="text-align:center; margin-bottom:20px">Criar Conta</h2>
-            <input type="text" id="r-user" placeholder="Nome de Usuário">
+        <div id="register-box" class="auth-box hidden">
+            <h2 style="text-align:center; color:var(--secondary)">Cadastro</h2>
+            <input type="text" id="r-user" placeholder="Usuário">
             <input type="password" id="r-pass" placeholder="Senha">
             
-            <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px; background:#252525; padding:10px; border-radius:5px">
-                <input type="checkbox" id="r-is-seller" onchange="toggleSellerFields()" style="width: 20px; height: 20px; margin: 0;">
-                <label for="r-is-seller" style="cursor: pointer;">Quero Vender Produtos</label>
+            <div style="margin:10px 0; background:#222; padding:10px; border-radius:5px">
+                <input type="checkbox" id="r-is-seller" onchange="toggleSellerInputs()" style="width:auto; margin-right:10px">
+                <label for="r-is-seller">Quero Vender</label>
             </div>
-
-            <div id="seller-fields" class="hidden" style="border-left: 2px solid var(--primary); padding-left: 10px;">
-                <small style="color: #aaa;">Dados para receber pagamentos:</small>
+            
+            <div id="seller-inputs" class="hidden">
                 <input type="text" id="r-pix" placeholder="Chave PIX">
-                <input type="text" id="r-wpp" placeholder="WhatsApp (Ex: 5511999999999)">
+                <input type="text" id="r-wpp" placeholder="WhatsApp (com DDD)">
             </div>
 
-            <button onclick="doRegister()" class="action-btn btn-sec" style="width:100%; margin-top:10px">Cadastrar</button>
-            <p onclick="toggleAuth()" style="margin-top:15px; cursor:pointer; color:var(--secondary); text-align:center">Voltar para Login</p>
+            <button onclick="doRegister()" class="btn-fill" style="background:var(--secondary); width:100%">Cadastrar</button>
+            <p onclick="toggleAuthScreens()" style="text-align:center; margin-top:15px; color:#aaa; cursor:pointer">Voltar</p>
         </div>
     </div>
 
-    <div id="app-main" class="app-container hidden">
+    <div id="app-container" class="hidden">
         
         <aside class="sidebar">
-            <div class="logo">
-                <i class="fas fa-skull"></i> DarkMarket
-            </div>
-            <nav class="menu-items">
-                <button onclick="renderScreen('shop')" class="menu-btn active" id="nav-shop">
-                    <i class="fas fa-store"></i> <span>Loja</span>
-                </button>
-                <button onclick="renderScreen('sell')" class="menu-btn hidden" id="nav-sell">
-                    <i class="fas fa-tags"></i> <span>Anunciar</span>
-                </button>
-                <div style="flex:1"></div> <button onclick="logout()" class="menu-btn" style="color:var(--danger)">
-                    <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
-                </button>
-            </nav>
+            <div class="brand">💀 DarkMarket</div>
+            
+            <button onclick="showSection('shop')" id="btn-shop" class="nav-btn active">
+                🛒 Loja
+            </button>
+            
+            <button onclick="showSection('sell')" id="btn-sell" class="nav-btn hidden">
+                🏷️ Anunciar
+            </button>
+
+            <div style="flex:1"></div> <button onclick="logout()" class="nav-btn" style="color:var(--danger)">
+                🚪 Sair
+            </button>
         </aside>
 
         <main class="main-content">
             
-            <div class="top-bar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="search-input" placeholder="Buscar produtos..." onkeyup="searchProducts()">
+            <header class="top-header">
+                <div class="search-wrapper">
+                    <span>🔍</span>
+                    <input type="text" id="search-input" placeholder="Pesquisar produto..." onkeyup="runSearch()">
                 </div>
                 <div style="display:flex; align-items:center; gap:10px">
-                    <span id="user-display" style="font-weight:bold; color:var(--primary)"></span>
-                    <button onclick="loadDataCloud()" class="action-btn btn-sec" style="padding:5px 10px; font-size:0.8rem"><i class="fas fa-sync"></i></button>
+                    <span id="user-welcome" style="color:var(--primary); font-weight:bold"></span>
+                    <button onclick="loadData()" class="btn-outline">↻</button>
                 </div>
-            </div>
+            </header>
 
-            <div id="shop-screen" class="screen-section">
-                <h2 style="margin-bottom:15px">Produtos Disponíveis</h2>
-                <div id="products-list" class="products-grid"></div>
-            </div>
-
-            <div id="sell-screen" class="screen-section hidden">
-                <h2 style="margin-bottom:15px">Novo Anúncio</h2>
-                <div style="background:var(--card-bg); padding:20px; border-radius:10px; max-width:600px">
-                    <input type="text" id="p-name" placeholder="Nome do Produto">
-                    <input type="text" id="p-img" placeholder="URL da Imagem">
-                    <input type="number" id="p-price" placeholder="Preço (R$)">
-                    <textarea id="p-desc" placeholder="Descrição Detalhada" rows="5"></textarea>
-                    <button onclick="postProduct()" class="action-btn btn-primary" style="width:100%">Publicar Produto</button>
+            <div class="scroll-area">
+                
+                <div id="section-shop">
+                    <h2 style="margin-bottom:15px">Produtos Recentes</h2>
+                    <div id="products-grid" class="grid"></div>
                 </div>
-            </div>
 
+                <div id="section-sell" class="hidden">
+                    <h2>Criar Anúncio</h2>
+                    <div style="background:var(--bg-card); padding:20px; max-width:500px; border-radius:8px; margin-top:10px">
+                        <label>Nome do Produto</label>
+                        <input type="text" id="p-name">
+                        <label>URL da Imagem</label>
+                        <input type="text" id="p-img">
+                        <label>Preço (R$)</label>
+                        <input type="number" id="p-price">
+                        <label>Descrição</label>
+                        <textarea id="p-desc" rows="4"></textarea>
+                        <button onclick="createProduct()" class="btn-fill" style="width:100%">Publicar</button>
+                    </div>
+                </div>
+
+            </div>
         </main>
     </div>
 
-    <div id="product-modal" class="hidden">
-        <div id="modal-overlay" onclick="closeModal(event)">
-            <div class="modal-content">
-                <span class="close-modal" onclick="document.getElementById('product-modal').classList.add('hidden')">&times;</span>
-                <div id="modal-body"></div>
+    <div id="modal-bg" class="hidden" onclick="if(event.target.id==='modal-bg') this.classList.add('hidden')">
+        <div id="modal-content" class="modal-body">
             </div>
-        </div>
     </div>
 
     <script>
-        // ================= CONFIG JSONBIN =================
+        // --- CONFIG ---
         const BIN_ID = '691ab4a143b1c97be9b262b4'; 
         const API_KEY = '$2a$10$A5x.MiQYJZrXPO9rQ6OfXeOnX7Hvz2JMcb5ZJS78vGK8D3RJoVejy'; 
         const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-        // ==================================================
 
-        let globalData = { users: [], products: [] };
-        let currentUser = null;
+        let data = { users: [], products: [] };
+        let user = null;
 
-        // --- REDE ---
-        async function fetchData() {
+        // --- API ---
+        async function loadData() {
             document.getElementById('loading').classList.remove('hidden');
             try {
                 const res = await fetch(URL + '/latest', { headers: { 'X-Master-Key': API_KEY } });
-                if(!res.ok) throw new Error("Erro API");
                 const json = await res.json();
-                globalData = json.record;
-                if(!globalData.users) globalData.users = [];
-                if(!globalData.products) globalData.products = [];
-            } catch (e) { console.error(e); } 
+                data = json.record || { users: [], products: [] };
+                renderShop(data.products);
+            } catch (e) { console.error(e); alert('Erro na rede'); }
             finally { document.getElementById('loading').classList.add('hidden'); }
         }
 
@@ -263,93 +266,70 @@
                 await fetch(URL, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-                    body: JSON.stringify(globalData)
+                    body: JSON.stringify(data)
                 });
-            } catch (e) { alert("Erro ao salvar!"); }
+            } catch(e) { alert('Erro ao salvar'); }
             finally { document.getElementById('loading').classList.add('hidden'); }
         }
 
-        // --- STARTUP ---
-        function init() {
-            const savedUser = sessionStorage.getItem('darkUser');
-            if(savedUser) {
-                currentUser = JSON.parse(savedUser);
-                enterApp();
-            }
-        }
-
-        function enterApp() {
-            document.getElementById('auth-layer').classList.add('hidden');
-            document.getElementById('app-main').classList.remove('hidden');
-            document.getElementById('user-display').innerText = `Olá, ${currentUser.user}`;
-            
-            // Configura Sidebar
-            if(currentUser.role === 'seller') {
-                document.getElementById('nav-sell').classList.remove('hidden');
-            }
-
-            loadDataCloud();
-        }
-
-        // --- BUSCA (LUPA) ---
-        function searchProducts() {
-            const term = document.getElementById('search-input').value.toLowerCase();
-            // Filtra os produtos
-            const filtered = globalData.products.filter(p => 
-                p.name.toLowerCase().includes(term) || 
-                p.desc.toLowerCase().includes(term)
-            );
-            // Renderiza apenas os filtrados
-            renderProducts(filtered);
-        }
-
         // --- AUTH ---
-        function toggleSellerFields() {
-            const isSeller = document.getElementById('r-is-seller').checked;
-            const fields = document.getElementById('seller-fields');
-            isSeller ? fields.classList.remove('hidden') : fields.classList.add('hidden');
+        function init() {
+            const saved = sessionStorage.getItem('darkUserV3');
+            if(saved) {
+                user = JSON.parse(saved);
+                startApp();
+            }
         }
 
-        function toggleAuth() {
-            document.getElementById('login-screen').classList.toggle('hidden');
-            document.getElementById('register-screen').classList.toggle('hidden');
+        function toggleAuthScreens() {
+            document.getElementById('login-box').classList.toggle('hidden');
+            document.getElementById('register-box').classList.toggle('hidden');
+        }
+
+        function toggleSellerInputs() {
+            const isSeller = document.getElementById('r-is-seller').checked;
+            const div = document.getElementById('seller-inputs');
+            isSeller ? div.classList.remove('hidden') : div.classList.add('hidden');
         }
 
         async function doRegister() {
-            const user = document.getElementById('r-user').value;
-            const pass = document.getElementById('r-pass').value;
+            const u = document.getElementById('r-user').value;
+            const p = document.getElementById('r-pass').value;
             const isSeller = document.getElementById('r-is-seller').checked;
             
-            if(!user || !pass) return alert("Preencha tudo!");
-            
-            let pix = "", wpp = "";
-            if (isSeller) {
+            if(!u || !p) return alert('Preencha tudo');
+
+            let pix='', wpp='';
+            if(isSeller) {
                 pix = document.getElementById('r-pix').value;
                 wpp = document.getElementById('r-wpp').value;
-                if(!pix || !wpp) return alert("Vendedor precisa de PIX e Whats!");
+                if(!pix || !wpp) return alert('Vendedores precisam de PIX e Zap');
             }
 
-            await fetchData();
-            if(globalData.users.find(u => u.user === user)) return alert("Usuário existe!");
+            await loadData();
+            if(data.users.find(x => x.user === u)) return alert('Usuário já existe');
 
-            globalData.users.push({ user, pass, role: isSeller ? 'seller' : 'buyer', pix, wpp });
+            data.users.push({ user: u, pass: p, role: isSeller?'seller':'buyer', pix, wpp });
             await saveData();
-            alert("Cadastrado!");
-            toggleAuth();
+            alert('Criado! Faça Login.');
+            toggleAuthScreens();
         }
 
         async function doLogin() {
-            const user = document.getElementById('l-user').value;
-            const pass = document.getElementById('l-pass').value;
-            await fetchData();
-            const found = globalData.users.find(u => u.user === user && u.pass === pass);
+            const u = document.getElementById('l-user').value;
+            const p = document.getElementById('l-pass').value;
+
+            await loadData();
+            const found = data.users.find(x => x.user === u && x.pass === p);
+            
             if(found) {
-                currentUser = found;
-                if(!currentUser.role) currentUser.role = (currentUser.pix) ? 'seller' : 'buyer';
-                sessionStorage.setItem('darkUser', JSON.stringify(currentUser));
-                enterApp();
+                user = found;
+                // Correção legado
+                if(!user.role) user.role = user.pix ? 'seller' : 'buyer';
+                sessionStorage.setItem('darkUserV3', JSON.stringify(user));
+                startApp();
             } else {
-                alert("Erro no login");
+                alert('Login errado');
             }
         }
 
@@ -358,150 +338,165 @@
             window.location.reload();
         }
 
-        // --- CORE ---
-        async function loadDataCloud() {
-            await fetchData();
-            renderProducts(globalData.products); // Carrega todos inicialmente
+        function startApp() {
+            document.getElementById('auth-overlay').classList.add('hidden'); // Esconde login
+            document.getElementById('app-container').classList.remove('hidden'); // Mostra painel
+            
+            document.getElementById('user-welcome').innerText = user.user;
+
+            if(user.role === 'seller') {
+                document.getElementById('btn-sell').classList.remove('hidden');
+            }
+
+            loadData();
         }
 
-        async function postProduct() {
+        // --- NAVEGAÇÃO ---
+        function showSection(sec) {
+            // Esconde todos
+            document.getElementById('section-shop').classList.add('hidden');
+            document.getElementById('section-sell').classList.add('hidden');
+            
+            // Remove active dos botoes
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            // Mostra o escolhido
+            document.getElementById('section-'+sec).classList.remove('hidden');
+            document.getElementById('btn-'+sec).classList.add('active');
+        }
+
+        // --- LOJA E BUSCA ---
+        function runSearch() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            const filtered = data.products.filter(p => p.name.toLowerCase().includes(term) || p.desc.toLowerCase().includes(term));
+            renderShop(filtered);
+        }
+
+        function renderShop(list) {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            
+            if(list.length === 0) {
+                grid.innerHTML = '<p style="color:#666">Nenhum produto.</p>';
+                return;
+            }
+
+            list.forEach(p => {
+                // Media estrelas
+                const revs = p.reviews || [];
+                let avg = 0;
+                if(revs.length) avg = (revs.reduce((a,b)=>a+b.stars,0) / revs.length).toFixed(1);
+                const badge = revs.length ? `⭐ ${avg}` : 'Novo';
+
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${p.img}" onclick="openModal(${p.id})" onerror="this.src='https://via.placeholder.com/300'">
+                        <div class="card-body">
+                            <div style="display:flex; justify-content:space-between; color:#777; font-size:0.8rem">
+                                <span>${p.seller}</span>
+                                <span>${badge}</span>
+                            </div>
+                            <h3 style="margin:5px 0; color:white">${p.name}</h3>
+                            <div class="price-tag">R$ ${p.price}</div>
+                            <button class="btn-fill" style="margin-top:auto" onclick="openModal(${p.id})">Ver Detalhes</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function createProduct() {
             const name = document.getElementById('p-name').value;
             const img = document.getElementById('p-img').value;
             const price = document.getElementById('p-price').value;
             const desc = document.getElementById('p-desc').value;
 
-            if(!name || !price) return alert("Dados incompletos");
+            if(!name || !price) return alert('Preencha campos obrigatórios');
 
-            await fetchData();
-            globalData.products.push({
+            await loadData(); // Refresh antes de postar
+            
+            data.products.push({
                 id: Date.now(),
-                seller: currentUser.user,
-                pix: currentUser.pix,
-                wpp: currentUser.wpp,
+                seller: user.user,
+                pix: user.pix,
+                wpp: user.wpp,
                 name, img, price, desc, reviews: []
             });
+
             await saveData();
-            alert("Publicado!");
-            document.getElementById('p-name').value = "";
-            renderScreen('shop');
+            alert('Publicado!');
+            // Limpar form
+            document.getElementById('p-name').value = '';
+            showSection('shop');
+            loadData();
         }
 
-        // Modificado para aceitar lista (para busca funcionar)
-        function renderProducts(list) {
-            const container = document.getElementById('products-list');
-            container.innerHTML = '';
-
-            if(list.length === 0) {
-                container.innerHTML = '<p style="color:#777; grid-column:1/-1; text-align:center">Nenhum produto encontrado.</p>';
-                return;
-            }
-
-            list.forEach(p => {
-                // Cálculo média estrelas
-                const revs = p.reviews || [];
-                let avg = 0;
-                if(revs.length) avg = (revs.reduce((a,b)=>a+b.stars,0) / revs.length).toFixed(1);
-                const starBadge = revs.length ? `<i class="fas fa-star" style="color:gold"></i> ${avg}` : 'Novo';
-
-                container.innerHTML += `
-                    <div class="product-card">
-                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="product-img" onclick="openDetails(${p.id})">
-                        <div class="product-info">
-                            <div style="display:flex; justify-content:space-between;">
-                                <small style="color:#888">${p.seller}</small>
-                                <span class="rating-badge">${starBadge}</span>
-                            </div>
-                            <h3>${p.name}</h3>
-                            <p class="price">R$ ${p.price}</p>
-                            <button onclick="openDetails(${p.id})" class="action-btn btn-primary" style="margin-top:auto">Ver Mais</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // --- MODAL & REVIEWS ---
-        function openDetails(id) {
-            const p = globalData.products.find(x => x.id == id);
+        // --- MODAL & AVALIAÇÃO ---
+        function openModal(id) {
+            const p = data.products.find(x => x.id == id);
             if(!p) return;
+
+            const wppUrl = `https://wa.me/${p.wpp}?text=Olá, tenho interesse em ${p.name}`;
             
+            // Render Reviews
             const revs = p.reviews || [];
-            let revsHtml = revs.length ? '' : '<p style="color:#666">Seja o primeiro a avaliar!</p>';
-            revs.forEach(r => {
-                revsHtml += `
-                    <div class="review-box">
-                        <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:#aaa">
-                            <span>${r.user}</span> <span>${r.date}</span>
-                        </div>
-                        <div style="color:gold">${'★'.repeat(r.stars)}</div>
-                        <p>${r.msg}</p>
-                    </div>
-                `;
-            });
+            let revsHtml = revs.map(r => `
+                <div style="background:#111; padding:10px; margin-bottom:5px; border-radius:5px; font-size:0.9rem">
+                    <div style="color:gold">${'⭐'.repeat(r.stars)} <span style="color:#777; margin-left:5px">- ${r.user}</span></div>
+                    <div>${r.msg}</div>
+                </div>
+            `).join('');
+            
+            if(!revsHtml) revsHtml = '<p style="color:#555">Sem avaliações ainda.</p>';
 
-            const wppUrl = `https://wa.me/${p.wpp}?text=Olá, interesse no ${p.name}`;
-
-            document.getElementById('modal-body').innerHTML = `
+            document.getElementById('modal-content').innerHTML = `
+                <button style="float:right; background:none; color:red; font-size:1.5rem" onclick="document.getElementById('modal-bg').classList.add('hidden')">×</button>
+                
                 <div style="display:flex; gap:20px; flex-wrap:wrap">
-                    <img src="${p.img}" style="width:100%; max-height:300px; object-fit:contain; background:#000; border-radius:5px">
+                    <img src="${p.img}" style="max-width:200px; border-radius:5px; object-fit:cover">
                     <div style="flex:1">
                         <h2 style="color:var(--primary)">${p.name}</h2>
-                        <h3 class="price">R$ ${p.price}</h3>
-                        <p style="margin:10px 0; line-height:1.4">${p.desc}</p>
-                        <div style="display:flex; gap:10px; margin-top:20px">
-                            <button class="action-btn btn-sec" onclick="prompt('Chave PIX:', '${p.pix}')"><i class="fas fa-qrcode"></i> Pagar PIX</button>
-                            <button class="action-btn" style="background:#25D366; color:white" onclick="window.open('${wppUrl}')"><i class="fab fa-whatsapp"></i> Contatar</button>
-                        </div>
+                        <h3 style="color:var(--secondary)">R$ ${p.price}</h3>
+                        <p style="color:#ccc; margin:10px 0">${p.desc}</p>
+                        <br>
+                        <button class="btn-outline" onclick="prompt('Chave PIX:', '${p.pix}')">📲 PIX</button>
+                        <button class="btn-fill" style="background:#25D366; color:white" onclick="window.open('${wppUrl}')">💬 WhatsApp</button>
                     </div>
                 </div>
-                <hr style="border:1px solid #333; margin:20px 0">
-                <h3>Avaliações</h3>
-                <div style="background:#2a2a2a; padding:15px; border-radius:5px; margin:10px 0">
-                    <select id="rev-stars" style="margin-bottom:5px; width:auto"><option value="5">5 Estrelas</option><option value="4">4 Estrelas</option><option value="3">3 Estrelas</option><option value="2">2 Estrelas</option><option value="1">1 Estrela</option></select>
-                    <input type="text" id="rev-msg" placeholder="Sua opinião...">
-                    <button class="action-btn btn-primary" onclick="sendReview(${p.id})">Avaliar</button>
-                </div>
-                <div style="max-height:200px; overflow-y:auto">${revsHtml}</div>
-            `;
-            document.getElementById('product-modal').classList.remove('hidden');
-        }
 
-        function closeModal(e) {
-            if(e.target.id === 'modal-overlay') document.getElementById('product-modal').classList.add('hidden');
+                <hr style="border:1px solid #333; margin:20px 0">
+                
+                <h3>Avaliações</h3>
+                <div style="background:#222; padding:10px; border-radius:5px; margin:10px 0">
+                    <select id="r-stars" style="width:100px"><option value="5">5 ⭐</option><option value="4">4 ⭐</option><option value="3">3 ⭐</option><option value="2">2 ⭐</option><option value="1">1 ⭐</option></select>
+                    <input id="r-msg" placeholder="Deixe sua opinião...">
+                    <button class="btn-fill" onclick="sendReview(${p.id})">Enviar</button>
+                </div>
+
+                <div style="max-height:200px; overflow-y:auto">
+                    ${revsHtml}
+                </div>
+            `;
+            document.getElementById('modal-bg').classList.remove('hidden');
         }
 
         async function sendReview(pid) {
-            const stars = parseInt(document.getElementById('rev-stars').value);
-            const msg = document.getElementById('rev-msg').value;
-            if(!msg) return alert("Escreva algo!");
+            const stars = parseInt(document.getElementById('r-stars').value);
+            const msg = document.getElementById('r-msg').value;
+            if(!msg) return alert('Escreva algo');
 
-            await fetchData();
-            const idx = globalData.products.findIndex(x => x.id == pid);
+            await loadData(); // Puxa versão mais nova
+            const idx = data.products.findIndex(x => x.id == pid);
             if(idx > -1) {
-                if(!globalData.products[idx].reviews) globalData.products[idx].reviews = [];
-                globalData.products[idx].reviews.unshift({ user: currentUser.user, stars, msg, date: new Date().toLocaleDateString() });
+                if(!data.products[idx].reviews) data.products[idx].reviews = [];
+                data.products[idx].reviews.unshift({ user: user.user, stars, msg });
                 await saveData();
-                openDetails(pid); // recarrega modal
-                searchProducts(); // atualiza fundo
+                openModal(pid); // Recarrega modal com nova review
+                runSearch(); // Atualiza grid de fundo
             }
-        }
-
-        // UI SWITCHER
-        function renderScreen(screenId) {
-            document.getElementById('shop-screen').classList.add('hidden');
-            document.getElementById('sell-screen').classList.add('hidden');
-            
-            document.getElementById(screenId+'-screen').classList.remove('hidden');
-
-            // Atualiza classe active no menu
-            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('nav-'+screenId)?.classList.add('active');
-
-            if(screenId === 'shop') loadDataCloud();
         }
 
         init();
     </script>
 </body>
 </html>
-
