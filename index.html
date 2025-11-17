@@ -81,7 +81,7 @@
         }
         .nav-menu button i { width: 20px; text-align: center; }
 
-        /* Estilo para o botão de Pesquisa */
+        /* Estilo para o botão de Pesquisa (Desktop) */
         #btn-search-toggle {
             width: 100%; background: transparent; color: var(--text-muted);
             text-align: left; padding: 12px; margin-bottom: 5px; border-radius: 6px;
@@ -130,18 +130,20 @@
         }
         .toast.show { transform: translateY(0); }
 
-        /* --- MOBILE RESPONSIVO (CORREÇÃO FINAL) --- */
+        /* --- MOBILE RESPONSIVO (CORREÇÃO FINAL DE ALINHAMENTO) --- */
         @media(max-width: 768px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
             
-            /* SIDEBAR NO MOBILE: Altura e alinhamento central garantido */
+            /* SIDEBAR NO MOBILE: Alinhamento central garantido */
             aside { 
                 width: 100%; 
-                height: 50px; /* CHAVE: Altura fixa para todos os elementos */
+                height: 60px; /* Altura mantida para bom espaçamento */
                 flex-direction: row; 
                 justify-content: space-between; 
-                align-items: center; /* CHAVE: Alinha todos os itens verticalmente */
-                padding: 0 10px; /* Padding horizontal */
+                align-items: center; 
+                padding: 0 10px; 
+                border-bottom: 1px solid var(--border); /* Adicionando borda inferior */
+                border-right: none;
             }
 
             .user-mini-profile { 
@@ -149,50 +151,52 @@
                 margin: 0; 
                 padding: 0; 
                 border: none; 
-                gap: 8px; 
+                gap: 10px; 
                 align-items: center; 
-                flex-shrink: 0; 
-                height: 50px; /* Força a altura para a centralização */
+                flex-shrink: 1; /* Permite encolher um pouco, se necessário */
             }
-            .avatar-circle { width: 35px; height: 35px; margin: 0; } /* Tamanho ligeiramente reduzido */
-            .user-name { font-size: 0.95rem; } /* Fonte menor para evitar quebra de linha */
+            .avatar-circle { width: 40px; height: 40px; margin: 0; } 
+            .user-name { font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; } 
             .user-role { display: none; }
             
-            /* Contêiner dos botões: Alinhamento e dimensões fixas */
+            /* Contêiner dos botões: Essencial para o alinhamento dos ícones */
             .mobile-controls { 
                 display: flex; 
-                gap: 10px; 
+                gap: 5px; /* Espaçamento menor entre os botões */
                 align-items: center;
-                height: 50px; /* Força a altura para a centralização */
                 flex-shrink: 0;
             } 
 
-            /* Ícone de Pesquisa (Lupa) */
+            /* Ícone de Pesquisa (Lupa): Ajuste para ser puramente um ícone centralizado */
             #btn-search-toggle { 
-                width: 40px; 
-                height: 40px;
+                width: 45px; 
+                height: 45px;
                 padding: 0; 
-                border: none; 
+                border: 1px solid var(--border); /* Manter a borda, mas como um quadrado */
+                background: transparent;
                 display: flex; 
                 align-items: center;
                 justify-content: center;
                 font-size: 1.2rem;
             }
-            #btn-search-toggle span { display: none; }
+            #btn-search-toggle span { display: none; } /* Oculta o texto "Pesquisar" */
             
-            /* Ícone de Menu Hambúrguer */
+            /* Ícone de Menu Hambúrguer: Ajuste para ter o mesmo tamanho e centralização da lupa */
             .mobile-toggle { 
-                display: block; 
+                width: 45px;
+                height: 45px;
+                display: flex; 
+                align-items: center;
+                justify-content: center;
                 font-size: 1.5rem; 
                 cursor: pointer; 
                 color: var(--text-main); 
-                height: 40px;
-                display: flex; /* Para centralizar o ícone de verdade */
-                align-items: center;
+                border: 1px solid var(--border);
+                border-radius: 6px;
             }
 
             /* Menu drop-down */
-            .nav-menu { display: none; position: absolute; top: 50px; left:0; width:100%; background: var(--bg-sidebar); padding: 10px; z-index: 999; }
+            .nav-menu { display: none; position: absolute; top: 60px; left:0; width:100%; background: var(--bg-sidebar); padding: 10px; z-index: 999; }
             .nav-menu.mobile-open { display: block; }
             .profile-form { grid-template-columns: 1fr; }
         }
