@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkMarket Pro Mobile Fixed</title>
+    <title>DarkMarket Pro Mobile FIXED</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> 
     <style>
         /* (*** O CSS COMPLETO PERMANECE INALTERADO ***) */
@@ -246,7 +246,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="init()">
 
     <div id="loader"></div>
     <div id="toast" class="toast">Notificação</div>
@@ -726,18 +726,18 @@
             };
         }
         
-        // 🌟 FUNÇÃO DE CONFIGURAÇÃO DE EVENTOS OTIMIZADA PARA MOBILE 🌟
+        // 🌟 FUNÇÃO DE CONFIGURAÇÃO DE EVENTOS OTIMIZADA PARA MOBILE (FIXED) 🌟
         function setupRatingInput() {
             const ratingInput = document.getElementById('rating-input');
             
             if (!ratingInput) {
+                console.warn("Elemento #rating-input não encontrado para configurar eventos.");
                 return; 
             }
 
             // Função unificada para tratar toque/clique
             const handleStarInteraction = (event) => {
-                // Previne o atraso do clique em mobile e possíveis conflitos
-                event.preventDefault(); 
+                event.preventDefault(); // Previne o comportamento padrão (ex: delay do clique)
                 
                 const star = event.target.closest('i'); 
                 
@@ -748,12 +748,13 @@
             };
 
             // 1. EVENTO DE TOQUE (Ideal para Celulares)
+            // Usamos { passive: false } para permitir o preventDefault e evitar scroll acidental.
             ratingInput.addEventListener('touchstart', handleStarInteraction, { passive: false });
             
-            // 2. EVENTO DE CLIQUE (Para compatibilidade com PC/navegadores que emulam toque)
+            // 2. EVENTO DE CLIQUE (Para PC e fallback)
             ratingInput.addEventListener('click', handleStarInteraction, { passive: false });
             
-            // 3. EVENTOS DE MOUSE (Apenas para visualização em PC, podem ser removidos no mobile)
+            // 3. EVENTOS DE MOUSE (Para visualização em PC)
             ratingInput.addEventListener('mouseover', (event) => {
                 const star = event.target.closest('i');
                 if (star && star.hasAttribute('data-rating')) {
@@ -909,7 +910,13 @@
             s.classList.toggle('hidden');
         }
         function previewAvatar(url) { if(url) document.getElementById('prof-avatar-preview').src=url; }
-        function showApp() { document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('app-shell').classList.remove('hidden'); updateSidebarUI(); }
+        function showApp() { 
+            document.getElementById('auth-overlay').classList.add('hidden'); 
+            document.getElementById('app-shell').classList.remove('hidden'); 
+            updateSidebarUI(); 
+            // 🌟 CHAMADA DE CONFIGURAÇÃO DO INPUT DE AVALIAÇÃO AGORA AQUI 🌟
+            setupRatingInput(); 
+        }
         function updateSidebarUI() {
             document.getElementById('sb-name').innerText = currentUser.user;
             const btn = document.getElementById('nav-btn-sell');
@@ -924,12 +931,6 @@
         function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
         function copy(t) { if(!t) return showToast("Sem dado"); navigator.clipboard.writeText(t); showToast("Copiado"); }
 
-
-        // 🌟 CHAMADA FINAL PARA GARANTIR QUE O DOM ESTEJA CARREGADO 🌟
-        document.addEventListener('DOMContentLoaded', () => {
-            setupRatingInput(); // Inicializa a lógica de eventos de clique/toque nas estrelas
-            init(); // Inicia o resto da aplicação
-        });
     </script>
 </body>
 </html>
