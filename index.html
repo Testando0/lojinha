@@ -110,7 +110,7 @@
         .profile-header { 
             background: var(--bg-card); padding: 20px; border-radius: 10px; 
             margin-bottom: 20px; border: 1px solid var(--border); 
-            display: flex; gap: 20px; align-items: flex-start; /* Mudado para flex-start para alinhar ao topo */
+            display: flex; gap: 20px; align-items: flex-start; 
         }
         .profile-info-container { flex: 1; width: 100%; }
         .profile-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -136,7 +136,7 @@
 
         /* --- MOBILE RESPONSIVO (CORREÇÕES) --- */
         @media(max-width: 768px) {
-            body { flex-direction: column; height: 100vh; overflow: hidden; /* Fixa o corpo */ }
+            body { flex-direction: column; height: 100vh; overflow: hidden; }
             
             aside { 
                 width: 100%; height: 60px; flex-direction: row; flex-shrink: 0;
@@ -168,7 +168,7 @@
 
             /* CORREÇÃO DA TELA DE PERFIL */
             .profile-header { 
-                flex-direction: column; /* Empilha foto e form */
+                flex-direction: column; 
                 align-items: center; 
                 text-align: center;
                 padding: 15px;
@@ -176,16 +176,16 @@
             .profile-header img { margin-bottom: 15px; width: 80px; height: 80px; }
             
             .profile-form { 
-                display: flex; /* Muda de Grid para Flex Coluna no mobile */
+                display: flex; 
                 flex-direction: column; 
-                gap: 0; /* Margin já existe nos inputs */
+                gap: 0; 
                 width: 100%;
             }
             .full-width { width: 100%; }
             
             /* CORREÇÃO DO GRID DE PRODUTOS */
             .grid { 
-                grid-template-columns: 1fr; /* 1 coluna por vez */
+                grid-template-columns: 1fr; 
             }
             
             /* Ajuste nos inputs do perfil para não estourarem */
@@ -226,7 +226,7 @@
             </div>
 
             <div id="seller-inputs" class="hidden">
-                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px; text-align:left;">Dados de Pagamento:</p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px; text-align:left;">Dados de Pagamento (PIX/WPP são obrigatórios para vender):</p>
                 <input type="text" id="r-pix" placeholder="Chave PIX">
                 <input type="text" id="r-wpp" placeholder="WhatsApp (com DDD)">
             </div>
@@ -295,14 +295,16 @@
                         <div class="profile-form">
                             <input type="text" id="edit-avatar" placeholder="URL Foto" onchange="previewAvatar(this.value)">
                             <input type="text" id="edit-user" placeholder="Usuário" readonly style="opacity:0.5;">
-                            <input type="text" id="edit-pix" placeholder="Chave PIX">
-                            <input type="text" id="edit-wpp" placeholder="WhatsApp">
+                            
+                            <input type="text" id="edit-pix" placeholder="Chave PIX" class="seller-only-field">
+                            <input type="text" id="edit-wpp" placeholder="WhatsApp" class="seller-only-field">
+                            
                             <textarea id="edit-bio" class="full-width" placeholder="Biografia..."></textarea>
                         </div>
                         <button onclick="updateProfile()" class="btn btn-accent" style="width:100%; margin-top:10px"><i class="fas fa-save"></i> Salvar</button>
                     </div>
                 </div>
-                <div id="seller-products-area">
+                <div id="seller-products-area"> 
                     <h3 style="margin-top:30px; padding-bottom:10px; border-bottom:1px solid #333">Meus Produtos</h3>
                     <div id="my-products-grid" class="grid" style="margin-top:15px"></div>
                 </div>
@@ -396,7 +398,7 @@
             const p = document.getElementById('r-pass').value;
             const isSeller = document.getElementById('r-is-seller').checked;
             
-            if(!u || !p) return showToast("Preencha tudo");
+            if(!u || !p) return showToast("Preencha usuário e senha");
             let pix='', wpp='';
             if(isSeller) {
                 pix = document.getElementById('r-pix').value;
@@ -431,7 +433,8 @@
             const idx = globalData.users.findIndex(x => x.user === currentUser.user);
             if(idx !== -1) {
                 if(av) globalData.users[idx].avatar = av;
-                globalData.users[idx].pix = px;
+                // Os campos são atualizados, mas só são mostrados/usados se for vendedor
+                globalData.users[idx].pix = px; 
                 globalData.users[idx].wpp = wp;
                 globalData.users[idx].bio = bi;
                 if(await saveData()) {
@@ -444,6 +447,7 @@
         }
 
         function renderProfilePage() {
+            // 1. CONFIGURA CAMPOS DE TEXTO
             document.getElementById('edit-user').value = currentUser.user;
             document.getElementById('edit-pix').value = currentUser.pix || '';
             document.getElementById('edit-wpp').value = currentUser.wpp || '';
@@ -451,16 +455,29 @@
             document.getElementById('edit-avatar').value = currentUser.avatar || '';
             document.getElementById('prof-avatar-preview').src = currentUser.avatar;
 
-            const area = document.getElementById('seller-products-area');
-            if(currentUser.role !== 'seller') { area.classList.add('hidden'); return; }
-            area.classList.remove('hidden');
+            // 2. CONTROLA VISIBILIDADE DE CAMPOS E ÁREA DE PRODUTOS
+            const isSeller = currentUser.role === 'seller';
+            const sellerFields = document.querySelectorAll('.seller-only-field');
+            const sellerArea = document.getElementById('seller-products-area');
 
-            const grid = document.getElementById('my-products-grid');
-            grid.innerHTML = '';
+            if (isSeller) {
+                sellerArea.classList.remove('hidden');
+                sellerFields.forEach(field => field.classList.remove('hidden'));
+            } else {
+                // Esconde PIX/WPP no formulário
+                sellerArea.classList.add('hidden');
+                sellerFields.forEach(field => field.classList.add('hidden'));
+                return; // Encerra a função para usuários que não são vendedores
+            }
+
+            // 3. RENDERIZA PRODUTOS (SÓ RODA PARA VENDEDORES)
+            const myGrid = document.getElementById('my-products-grid');
+            myGrid.innerHTML = '';
             const my = globalData.products.filter(p => p.seller === currentUser.user);
+            
             if(!my.length) grid.innerHTML = '<p style="color:#777">Sem produtos.</p>';
             my.forEach(p => {
-                grid.innerHTML += `
+                myGrid.innerHTML += `
                     <div class="card">
                         <img src="${p.img}" class="card-img" onerror="this.src='https://via.placeholder.com/300'">
                         <div class="card-body">
@@ -498,8 +515,8 @@
                             <p class="card-price">R$ ${p.price}</p>
                             <p class="card-desc">${p.desc}</p>
                             <div class="card-actions">
-                                <button onclick="copy('${pix}')" class="btn btn-primary" style="flex:1">Pix</button>
-                                <button onclick="window.open('https://wa.me/${wpp}')" class="btn btn-accent" style="flex:1">Wpp</button>
+                                <button onclick="copy('${pix}')" class="btn btn-primary" style="flex:1" ${!pix ? 'disabled' : ''}>Pix</button>
+                                <button onclick="window.open('https://wa.me/${wpp}')" class="btn btn-accent" style="flex:1" ${!wpp ? 'disabled' : ''}>Wpp</button>
                             </div>
                         </div>
                     </div>
@@ -508,7 +525,7 @@
         }
 
         async function postProduct() {
-            if(currentUser.role !== 'seller') return showToast("Apenas vendedores");
+            if(currentUser.role !== 'seller') return showToast("Apenas vendedores podem anunciar.");
             const n = document.getElementById('p-name').value;
             const i = document.getElementById('p-img').value;
             const pr = document.getElementById('p-price').value;
@@ -517,7 +534,11 @@
             
             toggleLoader(true);
             await loadData();
-            globalData.products.push({ id: Date.now(), seller: currentUser.user, name: n, img: i, price: pr, desc: d });
+            globalData.products.push({ 
+                id: Date.now(), seller: currentUser.user, name: n, img: i, price: pr, desc: d,
+                sellerPix: currentUser.pix, 
+                sellerWpp: currentUser.wpp
+            });
             if(await saveData()) {
                 showToast("Publicado!");
                 document.getElementById('p-name').value='';
@@ -545,6 +566,10 @@
                 <div style="flex:1">
                     <h3 style="margin-bottom:5px">${name}</h3>
                     <p style="color:#aaa; font-size:0.9rem">${u.bio || 'Sem bio'}</p>
+                    <div style="display:flex; gap:15px; font-size: 0.9rem; margin-top: 10px;">
+                        <span style="color:var(--accent);"><i class="fas fa-qrcode"></i> PIX: ${u.pix ? 'Cadastrado' : 'Não Informado'}</span>
+                        <span style="color:var(--accent);"><i class="fab fa-whatsapp"></i> WPP: ${u.wpp ? 'Cadastrado' : 'Não Informado'}</span>
+                    </div>
                 </div>
             `;
             const grid = document.getElementById('seller-products-grid');
@@ -559,8 +584,8 @@
                         <h4>${p.name}</h4>
                         <p class="card-price">R$ ${p.price}</p>
                         <div class="card-actions">
-                            <button onclick="copy('${u.pix}')" class="btn btn-primary" style="flex:1">Pix</button>
-                            <button onclick="window.open('https://wa.me/${u.wpp}')" class="btn btn-accent" style="flex:1">Wpp</button>
+                            <button onclick="copy('${u.pix}')" class="btn btn-primary" style="flex:1" ${!u.pix ? 'disabled' : ''}>Pix</button>
+                            <button onclick="window.open('https://wa.me/${u.wpp}')" class="btn btn-accent" style="flex:1" ${!u.wpp ? 'disabled' : ''}>Wpp</button>
                         </div>
                     </div>
                 </div>`;
@@ -601,4 +626,4 @@
         init();
     </script>
 </body>
-                                        </html>
+    </html>
