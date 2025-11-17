@@ -172,12 +172,14 @@
                 width: 45px; 
                 height: 45px;
                 padding: 0; 
-                border: 1px solid var(--border); /* Manter a borda, mas como um quadrado */
+                border: 1px solid var(--border);
                 background: transparent;
                 display: flex; 
                 align-items: center;
                 justify-content: center;
                 font-size: 1.2rem;
+                /* --- CORREÇÃO APLICADA: Move para baixo 10px (aproximadamente 1cm) --- */
+                margin-top: 10px; 
             }
             #btn-search-toggle span { display: none; } /* Oculta o texto "Pesquisar" */
             
