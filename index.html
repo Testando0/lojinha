@@ -188,6 +188,10 @@
                     <h2>Loja Global</h2>
                     <button onclick="loadData()" class="btn btn-ghost"><i class="fas fa-sync"></i> Atualizar Produtos</button>
                 </div>
+
+                <div style="margin-bottom: 20px; display:flex; gap: 10px;">
+                    <input type="text" id="search-term" placeholder="Pesquisar por nome ou descrição do produto..." style="flex: 1; margin: 0;" onkeyup="renderShop()">
+                </div>
                 <div id="products-grid" class="grid">
                     </div>
             </section>
@@ -234,6 +238,20 @@
                     </div>
             </section>
 
+            <section id="view-seller-profile" class="hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 id="seller-profile-name">Perfil de Vendedor</h2>
+                    <button onclick="navTo('shop')" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Voltar à Loja</button>
+                </div>
+
+                <div id="seller-info" class="profile-header">
+                    </div>
+
+                <h3 style="margin-top:40px; border-bottom:1px solid var(--border); padding-bottom:10px">Anúncios deste Vendedor</h3>
+                <div id="seller-products-grid" class="grid" style="margin-top:20px">
+                    </div>
+            </section>
+
         </main>
     </div>
 
@@ -246,9 +264,8 @@
         let globalData = { users: [], products: [] };
         let currentUser = null;
 
-        // --- INICIALIZAÇÃO (AGORA USA LOCALSTORAGE) ---
+        // --- INICIALIZAÇÃO (USA LOCALSTORAGE PARA PERSISTÊNCIA) ---
         function init() {
-            // CORREÇÃO: Usa localStorage para persistência de login
             const session = localStorage.getItem('darkUserPro'); 
             if(session) {
                 currentUser = JSON.parse(session);
@@ -257,7 +274,7 @@
             }
         }
 
-        // --- CONEXÃO ---
+        // --- CONEXÃO E PERSISTÊNCIA ---
         async function loadData() {
             toggleLoader(true);
             try {
@@ -266,12 +283,10 @@
                 const json = await res.json();
                 globalData = json.record;
                 
-                // Atualiza dados do usuário atual se ele estiver logado
                 if(currentUser) {
                     const updatedUser = globalData.users.find(u => u.user === currentUser.user);
                     if(updatedUser) {
                         currentUser = updatedUser;
-                        // CORREÇÃO: Atualiza no localStorage
                         localStorage.setItem('darkUserPro', JSON.stringify(currentUser)); 
                         updateSidebarUI();
                     }
@@ -316,7 +331,6 @@
             
             if(found) {
                 currentUser = found;
-                // CORREÇÃO: Salva permanentemente
                 localStorage.setItem('darkUserPro', JSON.stringify(found)); 
                 showApp();
                 showToast(`Bem-vindo, ${found.user}!`);
@@ -357,12 +371,11 @@
         }
 
         function logout() {
-            // CORREÇÃO: Limpa o armazenamento permanente
             localStorage.removeItem('darkUserPro'); 
             window.location.reload();
         }
 
-        // --- PERFIL E ATUALIZAÇÃO ---
+        // --- PERFIL PESSOAL E EDIÇÃO ---
         async function updateProfile() {
             const newAvatar = document.getElementById('edit-avatar').value;
             const newPix = document.getElementById('edit-pix').value;
@@ -381,7 +394,6 @@
 
                 if(await saveData()) {
                     currentUser = globalData.users[index];
-                    // CORREÇÃO: Atualiza o cache local
                     localStorage.setItem('darkUserPro', JSON.stringify(currentUser)); 
                     updateSidebarUI();
                     showToast("Perfil atualizado com sucesso!");
@@ -406,7 +418,7 @@
             myProds.forEach(p => {
                 myGrid.innerHTML += `
                     <div class="card">
-                        <img src="${p.img}" class="card-img">
+                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="card-img">
                         <div class="card-body">
                             <h4>${p.name}</h4>
                             <p class="card-price">R$ ${p.price}</p>
@@ -417,11 +429,61 @@
             });
         }
 
-        function previewAvatar(url) {
-            if(url) document.getElementById('prof-avatar-preview').src = url;
-        }
+        // --- PRODUTOS, BUSCA E LOJA ---
+        function renderShop() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            
+            // Lógica de pesquisa
+            const searchTerm = document.getElementById('search-term').value.toLowerCase();
+            
+            let filteredProds = globalData.products;
 
-        // --- PRODUTOS ---
+            if (searchTerm) {
+                filteredProds = globalData.products.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) || 
+                    p.desc.toLowerCase().includes(searchTerm) ||
+                    p.seller.toLowerCase().includes(searchTerm) // Permite buscar por vendedor
+                );
+            }
+
+            const sortedProds = [...filteredProds].reverse();
+
+            if (sortedProds.length === 0) {
+                 grid.innerHTML = `<p style="color:var(--text-muted); padding: 20px;">Nenhum produto encontrado para "${searchTerm}".</p>`;
+            }
+
+            sortedProds.forEach(p => {
+                const sellerData = globalData.users.find(u => u.user === p.seller) || {};
+                const sellerAvatar = sellerData.avatar || 'https://ui-avatars.com/api/?name='+p.seller+'&background=bb86fc&color=fff';
+                const currentWpp = sellerData.wpp || p.sellerWpp;
+                const currentPix = sellerData.pix || p.sellerPix;
+
+                const wppLink = `https://wa.me/${currentWpp}?text=Olá, vi seu anúncio do ${p.name} no DarkMarket.`;
+
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="card-img">
+                        <div class="card-body">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+                                <img src="${sellerAvatar}" style="width:30px; height:30px; border-radius:50%">
+                                <small style="color:var(--text-muted); cursor: pointer;" onclick="renderSellerProfile('${p.seller}')">
+                                    <i class="fas fa-user-circle"></i> ${p.seller}
+                                </small>
+                            </div>
+                            <h3>${p.name}</h3>
+                            <p class="card-price">R$ ${p.price}</p>
+                            <p class="card-desc">${p.desc}</p>
+                            <div class="card-actions">
+                                <button onclick="copyText('${currentPix}')" class="btn btn-primary" style="flex:1"><i class="fas fa-qrcode"></i> Pix</button>
+                                <button onclick="window.open('${wppLink}')" class="btn btn-accent" style="flex:1"><i class="fab fa-whatsapp"></i> Wpp</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
         async function postProduct() {
             const name = document.getElementById('p-name').value;
             const img = document.getElementById('p-img').value;
@@ -463,34 +525,53 @@
             }
         }
 
-        function renderShop() {
-            const grid = document.getElementById('products-grid');
-            grid.innerHTML = '';
+        // --- RENDERIZA PERFIL DE OUTRO VENDEDOR ---
+        function renderSellerProfile(sellerName) {
+            const seller = globalData.users.find(u => u.user === sellerName);
+            if (!seller) {
+                return showToast("Vendedor não encontrado!");
+            }
+
+            navTo('seller-profile');
+            document.getElementById('seller-profile-name').innerText = `Perfil de ${sellerName}`;
             
-            const sortedProds = [...globalData.products].reverse();
+            // Renderiza Informações do Vendedor
+            const infoContainer = document.getElementById('seller-info');
+            const defaultAvatar = 'https://ui-avatars.com/api/?name='+sellerName+'&background=bb86fc&color=fff';
+            const avatar = seller.avatar || defaultAvatar;
 
-            sortedProds.forEach(p => {
-                const sellerData = globalData.users.find(u => u.user === p.seller) || {};
-                const sellerAvatar = sellerData.avatar || 'https://via.placeholder.com/30';
-                const currentWpp = sellerData.wpp || p.sellerWpp;
-                const currentPix = sellerData.pix || p.sellerPix;
+            infoContainer.innerHTML = `
+                <img src="${avatar}" class="avatar-circle" style="width:100px; height:100px;">
+                <div style="flex:1">
+                    <h3>${sellerName}</h3>
+                    <p style="color:var(--text-muted); margin-bottom: 10px;">${seller.bio || 'Sem descrição.'}</p>
+                    <div style="display:flex; gap:15px; font-size: 0.9rem;">
+                        <span style="color:var(--accent);"><i class="fas fa-qrcode"></i> PIX: ${seller.pix ? 'Cadastrado' : 'Não Informado'}</span>
+                        <span style="color:var(--accent);"><i class="fab fa-whatsapp"></i> WPP: ${seller.wpp ? 'Cadastrado' : 'Não Informado'}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Renderiza Produtos do Vendedor
+            const productsGrid = document.getElementById('seller-products-grid');
+            productsGrid.innerHTML = '';
 
-                const wppLink = `https://wa.me/${currentWpp}?text=Olá, vi seu anúncio do ${p.name} no DarkMarket.`;
+            const sellerProds = globalData.products.filter(p => p.seller === sellerName).reverse();
 
-                grid.innerHTML += `
+            if (sellerProds.length === 0) productsGrid.innerHTML = `<p style="color:#777">${sellerName} não tem anúncios ativos.</p>`;
+
+            sellerProds.forEach(p => {
+                const wppLink = `https://wa.me/${seller.wpp}?text=Olá, vi seu anúncio do ${p.name} no DarkMarket.`;
+                productsGrid.innerHTML += `
                     <div class="card">
                         <img src="${p.img || 'https://via.placeholder.com/300'}" class="card-img">
                         <div class="card-body">
-                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
-                                <img src="${sellerAvatar}" style="width:30px; height:30px; border-radius:50%">
-                                <small style="color:var(--text-muted)">${p.seller}</small>
-                            </div>
-                            <h3>${p.name}</h3>
+                            <h4>${p.name}</h4>
                             <p class="card-price">R$ ${p.price}</p>
                             <p class="card-desc">${p.desc}</p>
                             <div class="card-actions">
-                                <button onclick="copyText('${currentPix}')" class="btn btn-primary" style="flex:1"><i class="fas fa-qrcode"></i> Pix</button>
-                                <button onclick="window.open('${wppLink}')" class="btn btn-accent" style="flex:1"><i class="fab fa-whatsapp"></i> Wpp</button>
+                                <button onclick="copyText('${seller.pix}')" class="btn btn-primary" style="flex:1" ${!seller.pix ? 'disabled' : ''}><i class="fas fa-qrcode"></i> Pix</button>
+                                <button onclick="window.open('${wppLink}')" class="btn btn-accent" style="flex:1" ${!seller.wpp ? 'disabled' : ''}><i class="fab fa-whatsapp"></i> Wpp</button>
                             </div>
                         </div>
                     </div>
@@ -499,6 +580,10 @@
         }
 
         // --- UI HELPERS ---
+        function previewAvatar(url) {
+            if(url) document.getElementById('prof-avatar-preview').src = url;
+        }
+
         function showApp() {
             document.getElementById('auth-overlay').classList.add('hidden');
             document.getElementById('app-shell').classList.remove('hidden');
@@ -511,12 +596,18 @@
         }
 
         function navTo(screen) {
-            ['view-shop', 'view-sell', 'view-profile'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['view-shop', 'view-sell', 'view-profile', 'view-seller-profile'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.querySelectorAll('.nav-menu button').forEach(b => b.classList.remove('active'));
             document.getElementById('view-'+screen).classList.remove('hidden');
             
-            if(screen === 'shop') { renderShop(); document.getElementById('btn-shop').classList.add('active'); }
-            if(screen === 'profile') { renderProfilePage(); }
+            // Marca o botão 'shop' como ativo se estiver navegando para ele
+            if(screen === 'shop') { 
+                renderShop(); 
+                document.getElementById('btn-shop').classList.add('active'); 
+            }
+            if(screen === 'profile') { 
+                renderProfilePage();
+            }
             
             document.querySelector('.nav-menu').classList.remove('mobile-open');
         }
@@ -544,8 +635,9 @@
         }
 
         function copyText(text) {
+            if (!text) return showToast("Informação de Pix não cadastrada!");
             navigator.clipboard.writeText(text);
-            showToast("Chave copiada!");
+            showToast("Chave Pix copiada!");
         }
 
         // Iniciar
