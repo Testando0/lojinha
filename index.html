@@ -93,7 +93,7 @@
         main { 
             flex: 1; 
             padding: 30px; 
-            padding-bottom: 100px; /* ✅ FIX: Maior clearance para o scroll */
+            padding-bottom: 100px; /* FIX: Maior clearance para o scroll */
             overflow-y: auto; 
             position: relative; 
         }
@@ -209,7 +209,7 @@
             /* CORREÇÃO DO CONTEÚDO PRINCIPAL */
             main { 
                 padding: 15px; 
-                padding-bottom: 80px; /* ✅ FIX: Maior clearance para o scroll mobile */
+                padding-bottom: 80px; /* FIX: Maior clearance para o scroll mobile */
                 overflow-y: auto; 
                 height: calc(100vh - 60px); 
             }
@@ -429,7 +429,9 @@
                 currentUser = JSON.parse(session);
                 showApp();
                 loadData();
-                setupRatingInput(); // Inicializa a lógica de estrelas
+                setupRatingInput(); // ✅ Chamada inicial correta
+            } else {
+                 setupRatingInput(); // Chamada para garantir que a lógica das estrelas seja configurada mesmo sem login (caso o modal seja aberto por debug, embora não deva)
             }
         }
 
@@ -735,16 +737,19 @@
         
         function setupRatingInput() {
             const stars = document.querySelectorAll('#rating-input i');
+            // ADICIONADO: console.log para debug. Se der 0, o HTML das estrelas não foi carregado
+            if(stars.length === 0) { console.warn("Estrelas de avaliação não encontradas. O sistema de clique não funcionará."); return; } 
+
             stars.forEach(star => {
                 star.addEventListener('click', () => {
                     currentRating = parseInt(star.getAttribute('data-rating'));
-                    highlightStars(currentRating);
+                    highlightStars(currentRating); // ATUALIZA O VISUAL AO CLICAR
                 });
                 star.addEventListener('mouseover', () => {
                     highlightStars(parseInt(star.getAttribute('data-rating')));
                 });
                 star.addEventListener('mouseout', () => {
-                    highlightStars(currentRating);
+                    highlightStars(currentRating); // Volta para a nota selecionada (ou 0)
                 });
             });
         }
@@ -764,11 +769,15 @@
         }
 
         function openProductDetail(id) {
+            // Verifica se o usuário está logado (para poder avaliar)
+            if (!currentUser) return showToast("Faça login para ver os detalhes e avaliar.");
+
             const product = globalData.products.find(p => p.id === id);
             if (!product) return showToast("Produto não encontrado.");
             
+            // --- RESET E CARREGAMENTO DE DADOS ---
             currentProductId = id;
-            currentRating = 0;
+            currentRating = 0; // Estado numérico resetado
             
             document.getElementById('modal-product-name').innerText = product.name;
             document.getElementById('modal-product-img').src = product.img || 'https://via.placeholder.com/300';
@@ -785,6 +794,7 @@
             const reviewFormArea = document.getElementById('review-form-area');
             const reviewStatus = document.getElementById('review-status');
 
+            // --- LÓGICA DE EXIBIÇÃO DO FORMULÁRIO DE AVALIAÇÃO ---
             if (existingReview) {
                 reviewFormArea.classList.add('hidden');
                 reviewStatus.style.color = 'var(--accent)';
@@ -794,10 +804,11 @@
                 reviewStatus.style.color = 'var(--danger)';
                 reviewStatus.innerText = "Você não pode avaliar seu próprio produto.";
             } else {
+                // Se puder avaliar:
                 reviewFormArea.classList.remove('hidden');
                 reviewStatus.innerText = '';
                 document.getElementById('review-comment').value = '';
-                highlightStars(0);
+                highlightStars(0); // REFORÇADO: Garantir que as estrelas estão vazias (far)
             }
 
             document.getElementById('product-detail-modal').classList.remove('hidden');
@@ -807,6 +818,8 @@
             document.getElementById('product-detail-modal').classList.add('hidden');
             currentProductId = null;
             currentRating = 0;
+            // Opcional: garantir que as estrelas no modal voltem ao estado zero
+            highlightStars(0);
         }
 
         function renderReviews(reviews) {
@@ -861,9 +874,7 @@
 
             if (await saveData()) {
                 showToast("Avaliação enviada!");
-                // Reabre o modal para atualizar a média e a lista
                 openProductDetail(currentProductId); 
-                // Atualiza a loja para mostrar a nova média de estrelas no card
                 renderShop(); 
             }
         }
