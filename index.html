@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkMarket Pro</title>
+    <title>DarkMarket Pro Mobile Fixed</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> 
     <style>
-        /* --- CSS: VARIÁVEIS E ESTILOS PROFISSIONAIS --- */
+        /* --- CSS: VARIÁVEIS E ESTILOS GERAIS --- */
         :root {
             --bg-body: #121212;
             --bg-sidebar: #1a1a1a;
             --bg-card: #252525;
             --text-main: #e0e0e0;
             --text-muted: #a0a0a0;
-            --primary: #bb86fc; /* Roxo */
+            --primary: #bb86fc; 
             --primary-hover: #9965f4;
-            --accent: #03dac6; /* Ciano/Verde */
+            --accent: #03dac6; 
             --danger: #cf6679;
             --border: #333;
         }
@@ -26,7 +26,7 @@
 
         /* --- UTILITÁRIOS --- */
         .hidden { display: none !important; }
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-primary { background: var(--primary); color: #000; }
         .btn-accent { background: var(--accent); color: #000; }
@@ -40,21 +40,21 @@
         }
         input:focus, textarea:focus { border-color: var(--primary); }
 
-        /* --- LOGIN & CADASTRO (FULLSCREEN) --- */
+        /* --- LOGIN & CADASTRO --- */
         #auth-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-body); z-index: 1000;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
         }
         .auth-box {
             background: var(--bg-card); padding: 40px; border-radius: 12px;
             width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             text-align: center; border: 1px solid var(--border);
-            max-height: 90vh; overflow-y: auto; /* Caso o cadastro fique longo em telas pequenas */
+            max-height: 90vh; overflow-y: auto;
         }
         .auth-logo { font-size: 2rem; color: var(--primary); margin-bottom: 20px; font-weight: bold; letter-spacing: 1px; }
 
-        /* --- LAYOUT PRINCIPAL --- */
+        /* --- LAYOUT SIDEBAR --- */
         aside {
             width: 260px; background: var(--bg-sidebar); height: 100%;
             display: flex; flex-direction: column; border-right: 1px solid var(--border);
@@ -82,107 +82,116 @@
         }
         .nav-menu button i { width: 20px; text-align: center; }
 
-        /* Estilo para o botão de Pesquisa (Desktop) */
         #btn-search-toggle {
             width: 100%; background: transparent; color: var(--text-muted);
             text-align: left; padding: 12px; margin-bottom: 5px; border-radius: 6px;
             display: flex; align-items: center; gap: 10px; font-size: 1rem;
-            border: 1px solid var(--border);
-            justify-content: center;
+            border: 1px solid var(--border); justify-content: center;
         }
-        #btn-search-toggle:hover {
-            color: var(--primary); background: rgba(187, 134, 252, 0.1); border-color: var(--primary);
-        }
-        #btn-search-toggle i { font-size: 1.2rem; }
 
-        /* Conteúdo Principal */
+        /* --- CONTEÚDO PRINCIPAL --- */
         main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
         
         h2 { font-size: 1.8rem; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 
-        /* Grid de Produtos */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        /* GRID DE PRODUTOS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
         .card { 
             background: var(--bg-card); border-radius: 10px; overflow: hidden; 
             border: 1px solid var(--border); transition: transform 0.2s; display: flex; flex-direction: column;
         }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
         .card-img { width: 100%; height: 180px; object-fit: cover; background: #333; }
         .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
         .card-price { color: var(--accent); font-size: 1.2rem; font-weight: bold; margin: 5px 0; }
         .card-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; flex: 1; }
         .card-actions { display: flex; gap: 10px; margin-top: auto; }
         
-        /* Página de Perfil */
-        .profile-header { background: var(--bg-card); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border); display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        /* PERFIL (DESKTOP PADRÃO) */
+        .profile-header { 
+            background: var(--bg-card); padding: 20px; border-radius: 10px; 
+            margin-bottom: 20px; border: 1px solid var(--border); 
+            display: flex; gap: 20px; align-items: flex-start; /* Mudado para flex-start para alinhar ao topo */
+        }
+        .profile-info-container { flex: 1; width: 100%; }
         .profile-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .full-width { grid-column: span 2; }
 
-        /* Loading e Toasts */
+        /* LOADING & TOAST */
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: transparent; z-index: 2000; }
         #loader.active { background: linear-gradient(90deg, var(--primary), var(--accent)); animation: load 1s infinite; }
         @keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
         .toast { 
-            position: fixed; bottom: 20px; right: 20px; 
-            background: var(--primary); color: #000; padding: 15px 25px; 
-            border-radius: 5px; font-weight: bold; transform: translateY(100px); 
-            transition: 0.3s; z-index: 3000;
+            position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: #000; 
+            padding: 15px 25px; border-radius: 5px; font-weight: bold; 
+            transform: translateY(100px); transition: 0.3s; z-index: 3000;
         }
         .toast.show { transform: translateY(0); }
 
-        /* Toggle Switch Customizado para o Cadastro */
+        /* CHECKBOX */
         .checkbox-wrapper {
-            display: flex; align-items: center; gap: 10px; 
-            background: #333; padding: 10px; border-radius: 6px; 
-            margin-bottom: 15px; border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px; background: #333; 
+            padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid var(--border);
         }
-        .checkbox-wrapper input[type="checkbox"] {
-            width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--primary);
-        }
+        .checkbox-wrapper input { margin: 0; width: 20px; height: 20px; }
 
-        /* --- MOBILE RESPONSIVO --- */
+        /* --- MOBILE RESPONSIVO (CORREÇÕES) --- */
         @media(max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow-y: auto; }
+            body { flex-direction: column; height: 100vh; overflow: hidden; /* Fixa o corpo */ }
             
             aside { 
-                width: 100%; 
-                height: 60px; 
-                flex-direction: row; 
-                justify-content: space-between; 
-                align-items: center; 
-                padding: 0 10px; 
-                border-bottom: 1px solid var(--border);
-                border-right: none;
+                width: 100%; height: 60px; flex-direction: row; flex-shrink: 0;
+                justify-content: space-between; align-items: center; 
+                padding: 0 15px; border-bottom: 1px solid var(--border); border-right: none;
             }
 
-            .user-mini-profile { 
-                flex-direction: row; margin: 0; padding: 0; border: none; gap: 10px; align-items: center; flex-shrink: 1;
+            /* Menu Dropdown Mobile */
+            .nav-menu { 
+                display: none; position: absolute; top: 60px; left:0; width:100%; 
+                background: var(--bg-card); padding: 15px; z-index: 999; border-bottom: 1px solid var(--primary); 
+                box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             }
-            .avatar-circle { width: 40px; height: 40px; margin: 0; } 
-            .user-name { font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; } 
+            .nav-menu.mobile-open { display: block; }
+
+            /* Header Mobile */
+            .user-mini-profile { flex-direction: row; margin: 0; padding: 0; border: none; gap: 10px; }
+            .avatar-circle { width: 35px; height: 35px; margin: 0; border-width: 2px; } 
+            .user-name { font-size: 0.9rem; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } 
             .user-role { display: none; }
             
-            .mobile-controls { display: flex; gap: 5px; align-items: center; flex-shrink: 0; } 
-
-            #btn-search-toggle { 
-                width: 45px; height: 45px; padding: 0; border: 1px solid var(--border);
-                border-radius: 6px; background: transparent; display: flex; align-items: center;
-                justify-content: center; font-size: 1.2rem; margin: 0; 
-                appearance: none; -webkit-appearance: none; line-height: 1; 
-            }
+            .mobile-controls { display: flex; gap: 10px; align-items: center; } 
+            #btn-search-toggle { width: 40px; height: 40px; font-size: 1.1rem; margin: 0; }
             #btn-search-toggle span { display: none; } 
-            
-            .mobile-toggle { 
-                width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
-                font-size: 1.5rem; cursor: pointer; color: var(--text-main); 
-                border: 1px solid var(--border); border-radius: 6px; line-height: 1; 
-            }
+            .mobile-toggle { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; border: 1px solid var(--border); border-radius: 6px; }
 
-            .nav-menu { display: none; position: absolute; top: 60px; left:0; width:100%; background: var(--bg-sidebar); padding: 10px; z-index: 999; }
-            .nav-menu.mobile-open { display: block; }
-            .profile-form { grid-template-columns: 1fr; }
+            /* CORREÇÃO DO CONTEÚDO PRINCIPAL */
+            main { padding: 15px; overflow-y: auto; height: calc(100vh - 60px); }
+
+            /* CORREÇÃO DA TELA DE PERFIL */
+            .profile-header { 
+                flex-direction: column; /* Empilha foto e form */
+                align-items: center; 
+                text-align: center;
+                padding: 15px;
+            }
+            .profile-header img { margin-bottom: 15px; width: 80px; height: 80px; }
+            
+            .profile-form { 
+                display: flex; /* Muda de Grid para Flex Coluna no mobile */
+                flex-direction: column; 
+                gap: 0; /* Margin já existe nos inputs */
+                width: 100%;
+            }
+            .full-width { width: 100%; }
+            
+            /* CORREÇÃO DO GRID DE PRODUTOS */
+            .grid { 
+                grid-template-columns: 1fr; /* 1 coluna por vez */
+            }
+            
+            /* Ajuste nos inputs do perfil para não estourarem */
+            input, textarea { width: 100%; box-sizing: border-box; }
         }
+
         @media(min-width: 769px) { 
             .mobile-toggle { display: none; } 
             .mobile-controls { display: none; }
@@ -200,7 +209,7 @@
             <h3>Bem-vindo de volta</h3>
             <input type="text" id="l-user" placeholder="Usuário">
             <input type="password" id="l-pass" placeholder="Senha">
-            <button onclick="doLogin()" class="btn btn-primary" style="width:100%; justify-content:center">Entrar na Conta</button>
+            <button onclick="doLogin()" class="btn btn-primary" style="width:100%">Entrar na Conta</button>
             <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem">
                 Não tem conta? <a href="#" onclick="toggleAuth()" style="color:var(--accent)">Cadastre-se</a>
             </p>
@@ -217,12 +226,12 @@
             </div>
 
             <div id="seller-inputs" class="hidden">
-                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px; text-align:left;">Dados para receber pagamento:</p>
-                <input type="text" id="r-pix" placeholder="Chave PIX (para receber)">
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px; text-align:left;">Dados de Pagamento:</p>
+                <input type="text" id="r-pix" placeholder="Chave PIX">
                 <input type="text" id="r-wpp" placeholder="WhatsApp (com DDD)">
             </div>
 
-            <button onclick="doRegister()" class="btn btn-accent" style="width:100%; justify-content:center">Criar Conta</button>
+            <button onclick="doRegister()" class="btn btn-accent" style="width:100%">Criar Conta</button>
             <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem">
                 Já tem conta? <a href="#" onclick="toggleAuth()" style="color:var(--primary)">Fazer Login</a>
             </p>
@@ -239,8 +248,8 @@
             </div>
             
             <div class="mobile-controls">
-                <button id="btn-search-toggle" onclick="toggleSearch()" title="Pesquisar Produtos">
-                    <i class="fas fa-search"></i> <span>Pesquisar</span>
+                <button id="btn-search-toggle" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
                 </button>
                 <div class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></div>
             </div>
@@ -254,83 +263,65 @@
         </aside>
 
         <main>
-            
             <section id="view-shop">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h2>Loja Global</h2>
-                    <button onclick="loadData()" class="btn btn-ghost"><i class="fas fa-sync"></i> Atualizar Produtos</button>
+                    <button onclick="loadData()" class="btn btn-ghost"><i class="fas fa-sync"></i></button>
                 </div>
-
                 <div id="search-container" class="hidden" style="margin-bottom: 20px; display:flex; gap: 10px; align-items: center;">
-                    <input type="text" id="search-term" placeholder="Pesquisar por nome, descrição ou vendedor..." style="flex: 1; margin: 0;">
-                    <button onclick="renderShop()" class="btn btn-primary" style="margin: 0; padding: 12px 15px;"><i class="fas fa-search"></i> Buscar</button>
+                    <input type="text" id="search-term" placeholder="Buscar..." style="flex: 1; margin: 0;">
+                    <button onclick="renderShop()" class="btn btn-primary" style="margin: 0;"><i class="fas fa-search"></i></button>
                 </div>
-                <div id="products-grid" class="grid">
-                    </div>
+                <div id="products-grid" class="grid"></div>
             </section>
 
             <section id="view-sell" class="hidden">
-                <h2>Anunciar Produto</h2>
+                <h2>Anunciar</h2>
                 <div style="background:var(--bg-card); padding:20px; border-radius:10px; border:1px solid var(--border); max-width:600px">
-                    <label>Nome do Produto</label>
-                    <input type="text" id="p-name" placeholder="Ex: iPhone 12 Usado">
-                    
-                    <label>Imagem (URL)</label>
-                    <input type="text" id="p-img" placeholder="http://...">
-                    
-                    <label>Preço (R$)</label>
-                    <input type="number" id="p-price" placeholder="0.00">
-                    
-                    <label>Descrição</label>
-                    <textarea id="p-desc" rows="4" placeholder="Detalhes do produto..."></textarea>
-                    
-                    <button onclick="postProduct()" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Publicar Anúncio</button>
+                    <input type="text" id="p-name" placeholder="Nome do Produto">
+                    <input type="text" id="p-img" placeholder="URL da Imagem">
+                    <input type="number" id="p-price" placeholder="Preço (R$)">
+                    <textarea id="p-desc" rows="4" placeholder="Descrição..."></textarea>
+                    <button onclick="postProduct()" class="btn btn-primary" style="width:100%">Publicar</button>
                 </div>
             </section>
 
             <section id="view-profile" class="hidden">
                 <h2>Meu Perfil</h2>
-                
                 <div class="profile-header">
                     <img id="prof-avatar-preview" src="" class="avatar-circle" style="width:100px; height:100px;">
-                    <div style="flex:1">
-                        <h3>Editar Informações</h3>
+                    <div class="profile-info-container">
+                        <h3 style="margin-bottom:15px; color:var(--accent)">Editar Dados</h3>
                         <div class="profile-form">
-                            <input type="text" id="edit-avatar" placeholder="URL da Foto de Perfil" onchange="previewAvatar(this.value)">
-                            <input type="text" id="edit-user" placeholder="Nome de Usuário (Display)" readonly style="opacity:0.5; cursor:not-allowed" title="Nome de usuário não pode ser alterado">
+                            <input type="text" id="edit-avatar" placeholder="URL Foto" onchange="previewAvatar(this.value)">
+                            <input type="text" id="edit-user" placeholder="Usuário" readonly style="opacity:0.5;">
                             <input type="text" id="edit-pix" placeholder="Chave PIX">
                             <input type="text" id="edit-wpp" placeholder="WhatsApp">
-                            <textarea id="edit-bio" class="full-width" placeholder="Escreva uma breve biografia sobre você ou sua loja..."></textarea>
+                            <textarea id="edit-bio" class="full-width" placeholder="Biografia..."></textarea>
                         </div>
-                        <button onclick="updateProfile()" class="btn btn-accent"><i class="fas fa-save"></i> Salvar Alterações</button>
+                        <button onclick="updateProfile()" class="btn btn-accent" style="width:100%; margin-top:10px"><i class="fas fa-save"></i> Salvar</button>
                     </div>
                 </div>
-
                 <div id="seller-products-area">
-                    <h3 style="margin-top:40px; border-bottom:1px solid var(--border); padding-bottom:10px">Meus Anúncios Ativos</h3>
-                    <div id="my-products-grid" class="grid" style="margin-top:20px"></div>
+                    <h3 style="margin-top:30px; padding-bottom:10px; border-bottom:1px solid #333">Meus Produtos</h3>
+                    <div id="my-products-grid" class="grid" style="margin-top:15px"></div>
                 </div>
             </section>
 
             <section id="view-seller-profile" class="hidden">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 id="seller-profile-name">Perfil de Vendedor</h2>
-                    <button onclick="navTo('shop')" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Voltar à Loja</button>
+                    <h2 id="seller-profile-name">Vendedor</h2>
+                    <button onclick="navTo('shop')" class="btn btn-ghost"><i class="fas fa-arrow-left"></i></button>
                 </div>
-
-                <div id="seller-info" class="profile-header">
-                    </div>
-
-                <h3 style="margin-top:40px; border-bottom:1px solid var(--border); padding-bottom:10px">Anúncios deste Vendedor</h3>
-                <div id="seller-products-grid" class="grid" style="margin-top:20px">
-                    </div>
+                <div id="seller-info" class="profile-header"></div>
+                <h3 style="margin-top:30px; border-bottom:1px solid #333; padding-bottom:10px">Produtos à venda</h3>
+                <div id="seller-products-grid" class="grid" style="margin-top:15px"></div>
             </section>
-
         </main>
     </div>
 
     <script>
-        // ================= CONFIGURAÇÃO =================
+        // CONFIG
         const BIN_ID = '691ab4a143b1c97be9b262b4'; 
         const API_KEY = '$2a$10$A5x.MiQYJZrXPO9rQ6OfXeOnX7Hvz2JMcb5ZJS78vGK8D3RJoVejy'; 
         const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
@@ -338,9 +329,8 @@
         let globalData = { users: [], products: [] };
         let currentUser = null;
 
-        // --- INICIALIZAÇÃO ---
         function init() {
-            const session = localStorage.getItem('darkUserPro'); 
+            const session = localStorage.getItem('darkUserProMobile'); 
             if(session) {
                 currentUser = JSON.parse(session);
                 showApp();
@@ -348,7 +338,6 @@
             }
         }
 
-        // --- CONEXÃO ---
         async function loadData() {
             toggleLoader(true);
             try {
@@ -356,146 +345,100 @@
                 if(!res.ok) throw new Error();
                 const json = await res.json();
                 globalData = json.record;
-                
                 if(currentUser) {
-                    const updatedUser = globalData.users.find(u => u.user === currentUser.user);
-                    if(updatedUser) {
-                        currentUser = updatedUser;
-                        // Correção legado: se não tiver role definida, assume buyer, ou seller se tiver PIX
+                    const u = globalData.users.find(x => x.user === currentUser.user);
+                    if(u) {
+                        currentUser = u;
                         if(!currentUser.role) currentUser.role = currentUser.pix ? 'seller' : 'buyer';
-                        
-                        localStorage.setItem('darkUserPro', JSON.stringify(currentUser)); 
+                        localStorage.setItem('darkUserProMobile', JSON.stringify(currentUser));
                         updateSidebarUI();
                     }
                 }
-
                 renderShop();
                 if(!document.getElementById('view-profile').classList.contains('hidden')) renderProfilePage();
-                
-            } catch (e) {
-                showToast("Erro de conexão.");
-            } finally {
-                toggleLoader(false);
-            }
+            } catch(e) { showToast("Erro de conexão"); }
+            finally { toggleLoader(false); }
         }
 
         async function saveData() {
             toggleLoader(true);
             try {
-                await fetch(URL, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-                    body: JSON.stringify(globalData)
-                });
+                await fetch(URL, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY }, body: JSON.stringify(globalData) });
                 return true;
-            } catch (e) {
-                showToast("Erro ao salvar.");
-                return false;
-            } finally {
-                toggleLoader(false);
-            }
+            } catch(e) { showToast("Erro ao salvar"); return false; }
+            finally { toggleLoader(false); }
         }
 
-        // --- UI HELPERS PARA CADASTRO ---
         function toggleSellerInputs() {
-            const isSeller = document.getElementById('r-is-seller').checked;
-            const inputsDiv = document.getElementById('seller-inputs');
-            if(isSeller) {
-                inputsDiv.classList.remove('hidden');
-            } else {
-                inputsDiv.classList.add('hidden');
-            }
+            const check = document.getElementById('r-is-seller').checked;
+            const div = document.getElementById('seller-inputs');
+            check ? div.classList.remove('hidden') : div.classList.add('hidden');
         }
 
-        // --- AUTENTICAÇÃO ---
         async function doLogin() {
-            const user = document.getElementById('l-user').value;
-            const pass = document.getElementById('l-pass').value;
-            
+            const u = document.getElementById('l-user').value;
+            const p = document.getElementById('l-pass').value;
             toggleLoader(true);
-            await loadData(); 
-
-            const found = globalData.users.find(u => u.user === user && u.pass === pass);
-            
+            await loadData();
+            const found = globalData.users.find(x => x.user === u && x.pass === p);
             if(found) {
                 currentUser = found;
-                if(!currentUser.role) currentUser.role = currentUser.pix ? 'seller' : 'buyer'; // Fallback
-                localStorage.setItem('darkUserPro', JSON.stringify(found)); 
+                if(!currentUser.role) currentUser.role = currentUser.pix ? 'seller' : 'buyer';
+                localStorage.setItem('darkUserProMobile', JSON.stringify(found));
                 showApp();
-                showToast(`Bem-vindo, ${found.user}!`);
-            } else {
-                showToast("Usuário ou senha incorretos.");
-            }
+                showToast("Bem-vindo!");
+            } else showToast("Dados incorretos");
             toggleLoader(false);
         }
 
         async function doRegister() {
-            const user = document.getElementById('r-user').value;
-            const pass = document.getElementById('r-pass').value;
+            const u = document.getElementById('r-user').value;
+            const p = document.getElementById('r-pass').value;
             const isSeller = document.getElementById('r-is-seller').checked;
             
-            if(!user || !pass) return showToast("Preencha usuário e senha");
-
-            let pix = "";
-            let wpp = "";
-
-            // Se for vendedor, exige Pix e Wpp
+            if(!u || !p) return showToast("Preencha tudo");
+            let pix='', wpp='';
             if(isSeller) {
                 pix = document.getElementById('r-pix').value;
                 wpp = document.getElementById('r-wpp').value;
-                if(!pix || !wpp) return showToast("Vendedores precisam de Pix e WhatsApp!");
+                if(!pix || !wpp) return showToast("Vendedor precisa de PIX/WPP");
             }
 
             toggleLoader(true);
             await loadData();
-
-            if(globalData.users.find(u => u.user === user)) {
-                toggleLoader(false);
-                return showToast("Usuário já existe!");
-            }
-
-            const newUser = { 
-                user, pass, pix, wpp,
-                role: isSeller ? 'seller' : 'buyer', // Define a Role
-                avatar: 'https://ui-avatars.com/api/?name='+user+'&background=bb86fc&color=fff',
-                bio: isSeller ? 'Vendedor novo no DarkMarket.' : 'Comprador.'
-            };
-
-            globalData.users.push(newUser);
+            if(globalData.users.find(x => x.user === u)) { toggleLoader(false); return showToast("Usuário já existe"); }
             
-            if(await saveData()) {
-                showToast("Conta criada! Faça login.");
-                toggleAuth();
-            }
+            globalData.users.push({
+                user: u, pass: p, pix, wpp,
+                role: isSeller ? 'seller' : 'buyer',
+                avatar: 'https://ui-avatars.com/api/?name='+u+'&background=bb86fc&color=fff',
+                bio: isSeller ? 'Vendedor novo.' : 'Comprador.'
+            });
+
+            if(await saveData()) { showToast("Criado! Faça login"); toggleAuth(); }
         }
 
-        function logout() {
-            localStorage.removeItem('darkUserPro'); 
-            window.location.reload();
-        }
+        function logout() { localStorage.removeItem('darkUserProMobile'); window.location.reload(); }
 
-        // --- PERFIL E NAVEGAÇÃO ---
         async function updateProfile() {
-            const newAvatar = document.getElementById('edit-avatar').value;
-            const newPix = document.getElementById('edit-pix').value;
-            const newWpp = document.getElementById('edit-wpp').value;
-            const newBio = document.getElementById('edit-bio').value;
+            const av = document.getElementById('edit-avatar').value;
+            const px = document.getElementById('edit-pix').value;
+            const wp = document.getElementById('edit-wpp').value;
+            const bi = document.getElementById('edit-bio').value;
 
             toggleLoader(true);
             await loadData();
-
-            const index = globalData.users.findIndex(u => u.user === currentUser.user);
-            if(index !== -1) {
-                globalData.users[index].avatar = newAvatar || globalData.users[index].avatar;
-                globalData.users[index].pix = newPix;
-                globalData.users[index].wpp = newWpp;
-                globalData.users[index].bio = newBio;
-
+            const idx = globalData.users.findIndex(x => x.user === currentUser.user);
+            if(idx !== -1) {
+                if(av) globalData.users[idx].avatar = av;
+                globalData.users[idx].pix = px;
+                globalData.users[idx].wpp = wp;
+                globalData.users[idx].bio = bi;
                 if(await saveData()) {
-                    currentUser = globalData.users[index];
-                    localStorage.setItem('darkUserPro', JSON.stringify(currentUser)); 
+                    currentUser = globalData.users[idx];
+                    localStorage.setItem('darkUserProMobile', JSON.stringify(currentUser));
                     updateSidebarUI();
-                    showToast("Perfil atualizado com sucesso!");
+                    showToast("Salvo!");
                 }
             }
         }
@@ -508,252 +451,152 @@
             document.getElementById('edit-avatar').value = currentUser.avatar || '';
             document.getElementById('prof-avatar-preview').src = currentUser.avatar;
 
-            // Se for comprador, esconde a área de "Meus Anúncios"
-            const sellerArea = document.getElementById('seller-products-area');
-            if(currentUser.role !== 'seller') {
-                sellerArea.classList.add('hidden');
-                return;
-            }
-            sellerArea.classList.remove('hidden');
+            const area = document.getElementById('seller-products-area');
+            if(currentUser.role !== 'seller') { area.classList.add('hidden'); return; }
+            area.classList.remove('hidden');
 
-            const myGrid = document.getElementById('my-products-grid');
-            myGrid.innerHTML = '';
-            const myProds = globalData.products.filter(p => p.seller === currentUser.user);
-
-            if(myProds.length === 0) myGrid.innerHTML = '<p style="color:#777">Você não tem produtos à venda.</p>';
-
-            myProds.forEach(p => {
-                myGrid.innerHTML += `
+            const grid = document.getElementById('my-products-grid');
+            grid.innerHTML = '';
+            const my = globalData.products.filter(p => p.seller === currentUser.user);
+            if(!my.length) grid.innerHTML = '<p style="color:#777">Sem produtos.</p>';
+            my.forEach(p => {
+                grid.innerHTML += `
                     <div class="card">
-                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="card-img">
+                        <img src="${p.img}" class="card-img" onerror="this.src='https://via.placeholder.com/300'">
                         <div class="card-body">
                             <h4>${p.name}</h4>
                             <p class="card-price">R$ ${p.price}</p>
-                            <button onclick="deleteProduct(${p.id})" class="btn btn-danger" style="margin-top:auto; width:100%; justify-content:center"><i class="fas fa-trash"></i> Excluir</button>
+                            <button onclick="deleteProduct(${p.id})" class="btn btn-danger" style="margin-top:auto; width:100%"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 `;
             });
         }
 
-        // --- PRODUTOS ---
         function renderShop() {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '';
-            const searchTerm = document.getElementById('search-term').value.toLowerCase();
+            const term = document.getElementById('search-term').value.toLowerCase();
+            let list = globalData.products;
+            if(term) list = list.filter(p => p.name.toLowerCase().includes(term) || p.desc.toLowerCase().includes(term));
             
-            let filteredProds = globalData.products;
-            if (searchTerm) {
-                filteredProds = globalData.products.filter(p => 
-                    p.name.toLowerCase().includes(searchTerm) || 
-                    p.desc.toLowerCase().includes(searchTerm) ||
-                    p.seller.toLowerCase().includes(searchTerm) 
-                );
-            }
-
-            const sortedProds = [...filteredProds].reverse();
-            if (sortedProds.length === 0) grid.innerHTML = `<p style="color:var(--text-muted); padding: 20px;">Nenhum produto encontrado.</p>`;
-
-            sortedProds.forEach(p => {
-                const sellerData = globalData.users.find(u => u.user === p.seller) || {};
-                const sellerAvatar = sellerData.avatar || 'https://ui-avatars.com/api/?name='+p.seller+'&background=bb86fc&color=fff';
-                const currentWpp = sellerData.wpp || p.sellerWpp;
-                const currentPix = sellerData.pix || p.sellerPix;
-                const wppLink = `https://wa.me/${currentWpp}?text=Olá, vi seu anúncio do ${p.name} no DarkMarket.`;
-
+            list.slice().reverse().forEach(p => {
+                const u = globalData.users.find(x => x.user === p.seller) || {};
+                const av = u.avatar || 'https://ui-avatars.com/api/?name='+p.seller;
+                const pix = u.pix || p.sellerPix;
+                const wpp = u.wpp || p.sellerWpp;
+                
                 grid.innerHTML += `
                     <div class="card">
-                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="card-img">
+                        <img src="${p.img}" class="card-img" onerror="this.src='https://via.placeholder.com/300'">
                         <div class="card-body">
-                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
-                                <img src="${sellerAvatar}" style="width:30px; height:30px; border-radius:50%">
-                                <small style="color:var(--text-muted); cursor: pointer;" onclick="renderSellerProfile('${p.seller}')">
-                                    <i class="fas fa-user-circle"></i> ${p.seller}
-                                </small>
+                            <div style="display:flex; gap:10px; align-items:center; margin-bottom:5px">
+                                <img src="${av}" style="width:25px; height:25px; border-radius:50%">
+                                <small onclick="renderSellerProfile('${p.seller}')" style="color:#aaa; cursor:pointer">${p.seller}</small>
                             </div>
                             <h3>${p.name}</h3>
                             <p class="card-price">R$ ${p.price}</p>
                             <p class="card-desc">${p.desc}</p>
                             <div class="card-actions">
-                                <button onclick="copyText('${currentPix}')" class="btn btn-primary" style="flex:1"><i class="fas fa-qrcode"></i> Pix</button>
-                                <button onclick="window.open('${wppLink}')" class="btn btn-accent" style="flex:1"><i class="fab fa-whatsapp"></i> Wpp</button>
+                                <button onclick="copy('${pix}')" class="btn btn-primary" style="flex:1">Pix</button>
+                                <button onclick="window.open('https://wa.me/${wpp}')" class="btn btn-accent" style="flex:1">Wpp</button>
                             </div>
                         </div>
                     </div>
                 `;
             });
         }
-        
+
         async function postProduct() {
-            if(currentUser.role !== 'seller') return showToast("Apenas vendedores podem anunciar.");
-
-            const name = document.getElementById('p-name').value;
-            const img = document.getElementById('p-img').value;
-            const price = document.getElementById('p-price').value;
-            const desc = document.getElementById('p-desc').value;
-
-            if(!name || !price) return showToast("Nome e preço obrigatórios");
-
+            if(currentUser.role !== 'seller') return showToast("Apenas vendedores");
+            const n = document.getElementById('p-name').value;
+            const i = document.getElementById('p-img').value;
+            const pr = document.getElementById('p-price').value;
+            const d = document.getElementById('p-desc').value;
+            if(!n || !pr) return showToast("Nome e Preço obrigatórios");
+            
             toggleLoader(true);
             await loadData();
-
-            globalData.products.push({
-                id: Date.now(),
-                seller: currentUser.user,
-                name, img, price, desc,
-                sellerPix: currentUser.pix, 
-                sellerWpp: currentUser.wpp
-            });
-
+            globalData.products.push({ id: Date.now(), seller: currentUser.user, name: n, img: i, price: pr, desc: d });
             if(await saveData()) {
-                showToast("Produto anunciado!");
-                document.getElementById('p-name').value = "";
-                document.getElementById('p-desc').value = "";
+                showToast("Publicado!");
+                document.getElementById('p-name').value='';
+                document.getElementById('p-desc').value='';
                 navTo('shop');
             }
         }
 
         async function deleteProduct(id) {
-            if(!confirm("Tem certeza que deseja excluir este anúncio?")) return;
+            if(!confirm("Excluir?")) return;
             toggleLoader(true);
             await loadData();
             globalData.products = globalData.products.filter(p => p.id !== id);
-            if(await saveData()) {
-                showToast("Produto excluído.");
-                renderProfilePage();
-            }
+            if(await saveData()) { showToast("Deletado"); renderProfilePage(); }
         }
 
-        function renderSellerProfile(sellerName) {
-            const seller = globalData.users.find(u => u.user === sellerName);
-            if (!seller) return showToast("Vendedor não encontrado!");
-
+        function renderSellerProfile(name) {
+            const u = globalData.users.find(x => x.user === name);
+            if(!u) return showToast("Vendedor não encontrado");
             navTo('seller-profile');
-            document.getElementById('seller-profile-name').innerText = `Perfil de ${sellerName}`;
-            
-            const infoContainer = document.getElementById('seller-info');
-            const avatar = seller.avatar || 'https://ui-avatars.com/api/?name='+sellerName+'&background=bb86fc&color=fff';
-
-            infoContainer.innerHTML = `
-                <img src="${avatar}" class="avatar-circle" style="width:100px; height:100px;">
+            document.getElementById('seller-profile-name').innerText = name;
+            const av = u.avatar || 'https://ui-avatars.com/api/?name='+name;
+            document.getElementById('seller-info').innerHTML = `
+                <img src="${av}" class="avatar-circle" style="width:80px; height:80px;">
                 <div style="flex:1">
-                    <h3>${sellerName}</h3>
-                    <p style="color:var(--text-muted); margin-bottom: 10px;">${seller.bio || 'Sem descrição.'}</p>
-                    <div style="display:flex; gap:15px; font-size: 0.9rem;">
-                        <span style="color:var(--accent);"><i class="fas fa-qrcode"></i> PIX: ${seller.pix ? 'Cadastrado' : 'Não Informado'}</span>
-                        <span style="color:var(--accent);"><i class="fab fa-whatsapp"></i> WPP: ${seller.wpp ? 'Cadastrado' : 'Não Informado'}</span>
-                    </div>
+                    <h3 style="margin-bottom:5px">${name}</h3>
+                    <p style="color:#aaa; font-size:0.9rem">${u.bio || 'Sem bio'}</p>
                 </div>
             `;
-            
-            const productsGrid = document.getElementById('seller-products-grid');
-            productsGrid.innerHTML = '';
-            const sellerProds = globalData.products.filter(p => p.seller === sellerName).reverse();
-
-            if (sellerProds.length === 0) productsGrid.innerHTML = `<p style="color:#777">${sellerName} não tem anúncios ativos.</p>`;
-
-            sellerProds.forEach(p => {
-                const wppLink = `https://wa.me/${seller.wpp}?text=Olá, vi seu anúncio do ${p.name} no DarkMarket.`;
-                productsGrid.innerHTML += `
-                    <div class="card">
-                        <img src="${p.img || 'https://via.placeholder.com/300'}" class="card-img">
-                        <div class="card-body">
-                            <h4>${p.name}</h4>
-                            <p class="card-price">R$ ${p.price}</p>
-                            <p class="card-desc">${p.desc}</p>
-                            <div class="card-actions">
-                                <button onclick="copyText('${seller.pix}')" class="btn btn-primary" style="flex:1" ${!seller.pix ? 'disabled' : ''}><i class="fas fa-qrcode"></i> Pix</button>
-                                <button onclick="window.open('${wppLink}')" class="btn btn-accent" style="flex:1" ${!seller.wpp ? 'disabled' : ''}><i class="fab fa-whatsapp"></i> Wpp</button>
-                            </div>
+            const grid = document.getElementById('seller-products-grid');
+            grid.innerHTML = '';
+            const list = globalData.products.filter(p => p.seller === name);
+            if(!list.length) grid.innerHTML = '<p>Sem produtos</p>';
+            list.forEach(p => {
+                grid.innerHTML += `
+                <div class="card">
+                    <img src="${p.img}" class="card-img" onerror="this.src='https://via.placeholder.com/300'">
+                    <div class="card-body">
+                        <h4>${p.name}</h4>
+                        <p class="card-price">R$ ${p.price}</p>
+                        <div class="card-actions">
+                            <button onclick="copy('${u.pix}')" class="btn btn-primary" style="flex:1">Pix</button>
+                            <button onclick="window.open('https://wa.me/${u.wpp}')" class="btn btn-accent" style="flex:1">Wpp</button>
                         </div>
                     </div>
-                `;
+                </div>`;
             });
         }
 
-        // --- UI GERAL ---
+        function navTo(screen) {
+            ['view-shop','view-sell','view-profile','view-seller-profile'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+            document.querySelectorAll('.nav-menu button').forEach(b=>b.classList.remove('active'));
+            document.getElementById('view-'+screen).classList.remove('hidden');
+            if(screen==='shop') document.getElementById('btn-shop').classList.add('active');
+            if(screen==='sell') document.getElementById('nav-btn-sell').classList.add('active');
+            if(screen==='profile') renderProfilePage();
+            document.querySelector('.nav-menu').classList.remove('mobile-open');
+            if(screen!=='shop') document.getElementById('search-container').classList.add('hidden');
+        }
         function toggleSearch() {
-            const searchContainer = document.getElementById('search-container');
-            const searchInput = document.getElementById('search-term');
-            navTo('shop'); 
-            searchContainer.classList.toggle('hidden');
-            if (!searchContainer.classList.contains('hidden')) {
-                searchInput.focus();
-            } else if (searchInput.value !== '') {
-                searchInput.value = '';
-                renderShop(); 
-            }
+            const s = document.getElementById('search-container');
+            navTo('shop');
+            s.classList.toggle('hidden');
         }
-        
-        function previewAvatar(url) {
-            if(url) document.getElementById('prof-avatar-preview').src = url;
-        }
-
-        function showApp() {
-            document.getElementById('auth-overlay').classList.add('hidden');
-            document.getElementById('app-shell').classList.remove('hidden');
-            updateSidebarUI();
-        }
-
+        function previewAvatar(url) { if(url) document.getElementById('prof-avatar-preview').src=url; }
+        function showApp() { document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('app-shell').classList.remove('hidden'); updateSidebarUI(); }
         function updateSidebarUI() {
             document.getElementById('sb-name').innerText = currentUser.user;
-            
-            // Lógica do Botão Vender e Role
-            const sellBtn = document.getElementById('nav-btn-sell');
-            const roleLabel = document.getElementById('sb-role');
-            
-            if(currentUser.role === 'seller') {
-                sellBtn.classList.remove('hidden'); // Mostra botão
-                roleLabel.innerText = "Vendedor Verificado";
-                roleLabel.style.color = "var(--accent)";
-            } else {
-                sellBtn.classList.add('hidden'); // Esconde botão
-                roleLabel.innerText = "Comprador";
-                roleLabel.style.color = "var(--text-muted)";
-            }
-
-            if(currentUser.avatar) document.getElementById('sb-avatar').src = currentUser.avatar;
+            const btn = document.getElementById('nav-btn-sell');
+            const lbl = document.getElementById('sb-role');
+            if(currentUser.role === 'seller') { btn.classList.remove('hidden'); lbl.innerText='Vendedor'; lbl.style.color='var(--accent)'; }
+            else { btn.classList.add('hidden'); lbl.innerText='Comprador'; lbl.style.color='#777'; }
+            if(currentUser.avatar) document.getElementById('sb-avatar').src=currentUser.avatar;
         }
-
-        function navTo(screen) {
-            ['view-shop', 'view-sell', 'view-profile', 'view-seller-profile'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.querySelectorAll('.nav-menu button').forEach(b => b.classList.remove('active'));
-            document.getElementById('view-'+screen).classList.remove('hidden');
-            
-            if(screen === 'shop') { renderShop(); document.getElementById('btn-shop').classList.add('active'); }
-            if(screen === 'sell') { document.getElementById('nav-btn-sell').classList.add('active'); } // Highlight
-            if(screen === 'profile') { renderProfilePage(); }
-            
-            document.querySelector('.nav-menu').classList.remove('mobile-open');
-            if (screen !== 'shop') document.getElementById('search-container').classList.add('hidden');
-        }
-
-        function toggleAuth() {
-            document.getElementById('login-box').classList.toggle('hidden');
-            document.getElementById('register-box').classList.toggle('hidden');
-        }
-
-        function toggleMobileMenu() {
-            document.querySelector('.nav-menu').classList.toggle('mobile-open');
-        }
-
-        function toggleLoader(show) {
-            const l = document.getElementById('loader');
-            if(show) l.classList.add('active'); else l.classList.remove('active');
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        function copyText(text) {
-            if (!text) return showToast("Informação não disponível!");
-            navigator.clipboard.writeText(text);
-            showToast("Copiado!");
-        }
+        function toggleAuth() { document.getElementById('login-box').classList.toggle('hidden'); document.getElementById('register-box').classList.toggle('hidden'); }
+        function toggleMobileMenu() { document.querySelector('.nav-menu').classList.toggle('mobile-open'); }
+        function toggleLoader(show) { const l=document.getElementById('loader'); show?l.classList.add('active'):l.classList.remove('active'); }
+        function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+        function copy(t) { if(!t) return showToast("Sem dado"); navigator.clipboard.writeText(t); showToast("Copiado"); }
 
         init();
     </script>
