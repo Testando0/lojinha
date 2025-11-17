@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkMarket Pro Mobile - Sem Avaliações</title>
+    <title>DarkMarket Pro Mobile Fixed</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> 
     <style>
         /* --- CSS: VARIÁVEIS E ESTILOS GERAIS --- */
@@ -90,13 +90,7 @@
         }
 
         /* --- CONTEÚDO PRINCIPAL --- */
-        main { 
-            flex: 1; 
-            padding: 30px; 
-            padding-bottom: 100px;
-            overflow-y: auto; 
-            position: relative; 
-        }
+        main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
         
         h2 { font-size: 1.8rem; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 
@@ -116,27 +110,11 @@
         .profile-header { 
             background: var(--bg-card); padding: 20px; border-radius: 10px; 
             margin-bottom: 20px; border: 1px solid var(--border); 
-            display: flex; gap: 20px; align-items: flex-start; 
+            display: flex; gap: 20px; align-items: flex-start; /* Mudado para flex-start para alinhar ao topo */
         }
         .profile-info-container { flex: 1; width: 100%; }
         .profile-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .full-width { grid-column: span 2; }
-
-        /* --- MODAL DE DETALHES (Sem Avaliações) --- */
-        #product-detail-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); z-index: 1000;
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px; overflow-y: auto;
-        }
-        .modal-content {
-            background: var(--bg-card); border-radius: 12px; width: 100%; max-width: 800px;
-            padding: 30px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
-            max-height: 90vh; overflow-y: auto;
-        }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-close { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
-
 
         /* LOADING & TOAST */
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: transparent; z-index: 2000; }
@@ -156,9 +134,9 @@
         }
         .checkbox-wrapper input { margin: 0; width: 20px; height: 20px; }
 
-        /* --- MOBILE RESPONSIVO --- */
+        /* --- MOBILE RESPONSIVO (CORREÇÕES) --- */
         @media(max-width: 768px) {
-            body { flex-direction: column; height: 100vh; overflow: hidden; }
+            body { flex-direction: column; height: 100vh; overflow: hidden; /* Fixa o corpo */ }
             
             aside { 
                 width: 100%; height: 60px; flex-direction: row; flex-shrink: 0;
@@ -185,17 +163,12 @@
             #btn-search-toggle span { display: none; } 
             .mobile-toggle { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; border: 1px solid var(--border); border-radius: 6px; }
 
-            /* CONTEÚDO PRINCIPAL */
-            main { 
-                padding: 15px; 
-                padding-bottom: 80px; 
-                overflow-y: auto; 
-                height: calc(100vh - 60px); 
-            }
+            /* CORREÇÃO DO CONTEÚDO PRINCIPAL */
+            main { padding: 15px; overflow-y: auto; height: calc(100vh - 60px); }
 
-            /* TELA DE PERFIL */
+            /* CORREÇÃO DA TELA DE PERFIL */
             .profile-header { 
-                flex-direction: column; 
+                flex-direction: column; /* Empilha foto e form */
                 align-items: center; 
                 text-align: center;
                 padding: 15px;
@@ -203,19 +176,19 @@
             .profile-header img { margin-bottom: 15px; width: 80px; height: 80px; }
             
             .profile-form { 
-                display: flex; 
+                display: flex; /* Muda de Grid para Flex Coluna no mobile */
                 flex-direction: column; 
-                gap: 0; 
+                gap: 0; /* Margin já existe nos inputs */
                 width: 100%;
             }
             .full-width { width: 100%; }
             
-            /* GRID DE PRODUTOS */
+            /* CORREÇÃO DO GRID DE PRODUTOS */
             .grid { 
-                grid-template-columns: 1fr; 
+                grid-template-columns: 1fr; /* 1 coluna por vez */
             }
             
-            /* Ajuste nos inputs do perfil */
+            /* Ajuste nos inputs do perfil para não estourarem */
             input, textarea { width: 100%; box-sizing: border-box; }
         }
 
@@ -225,7 +198,7 @@
         }
     </style>
 </head>
-<body onload="init()">
+<body>
 
     <div id="loader"></div>
     <div id="toast" class="toast">Notificação</div>
@@ -253,7 +226,7 @@
             </div>
 
             <div id="seller-inputs" class="hidden">
-                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px; text-align:left;">Dados de Pagamento (PIX/WPP são obrigatórios para vender):</p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px; text-align:left;">Dados de Pagamento:</p>
                 <input type="text" id="r-pix" placeholder="Chave PIX">
                 <input type="text" id="r-wpp" placeholder="WhatsApp (com DDD)">
             </div>
@@ -322,16 +295,14 @@
                         <div class="profile-form">
                             <input type="text" id="edit-avatar" placeholder="URL Foto" onchange="previewAvatar(this.value)">
                             <input type="text" id="edit-user" placeholder="Usuário" readonly style="opacity:0.5;">
-                            
-                            <input type="text" id="edit-pix" placeholder="Chave PIX" class="seller-only-field">
-                            <input type="text" id="edit-wpp" placeholder="WhatsApp" class="seller-only-field">
-                            
+                            <input type="text" id="edit-pix" placeholder="Chave PIX">
+                            <input type="text" id="edit-wpp" placeholder="WhatsApp">
                             <textarea id="edit-bio" class="full-width" placeholder="Biografia..."></textarea>
                         </div>
                         <button onclick="updateProfile()" class="btn btn-accent" style="width:100%; margin-top:10px"><i class="fas fa-save"></i> Salvar</button>
                     </div>
                 </div>
-                <div id="seller-products-area"> 
+                <div id="seller-products-area">
                     <h3 style="margin-top:30px; padding-bottom:10px; border-bottom:1px solid #333">Meus Produtos</h3>
                     <div id="my-products-grid" class="grid" style="margin-top:15px"></div>
                 </div>
@@ -349,28 +320,6 @@
         </main>
     </div>
 
-    <div id="product-detail-modal" class="hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-product-name"></h2>
-                <button onclick="closeProductDetail()" class="modal-close"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <div style="display:flex; gap: 20px; flex-wrap: wrap;">
-                <img id="modal-product-img" style="width: 100%; max-width: 300px; height: 300px; object-fit: cover; border-radius: 8px;">
-                <div style="flex: 1; min-width: 250px;">
-                    <p style="font-size: 1.5rem; color: var(--accent); font-weight: bold; margin-bottom: 15px;" id="modal-product-price"></p>
-                    <p style="color:var(--text-muted); margin-top: 10px;" id="modal-product-desc"></p>
-                    <div style="margin-top: 20px;">
-                        <span style="font-weight: bold; color: var(--primary);">Vendedor: </span>
-                        <a href="#" id="modal-seller-link" style="color: var(--accent); text-decoration: none;"></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
     <script>
         // CONFIG
         const BIN_ID = '691ab4a143b1c97be9b262b4'; 
@@ -379,26 +328,15 @@
         
         let globalData = { users: [], products: [] };
         let currentUser = null;
-        let currentProductId = null;
 
         function init() {
             const session = localStorage.getItem('darkUserProMobile'); 
             if(session) {
-                // Tenta carregar o usuário da sessão local
-                try {
-                    currentUser = JSON.parse(session);
-                    showApp();
-                    // Garante que os dados mais recentes sejam carregados após o login.
-                    loadData(); 
-                } catch(e) {
-                    // Limpa a sessão se for inválida, forçando novo login.
-                    localStorage.removeItem('darkUserProMobile');
-                    console.error("Sessão local inválida. Limpando.");
-                }
+                currentUser = JSON.parse(session);
+                showApp();
+                loadData();
             }
         }
-
-        /* --- FUNÇÕES DE DADOS E CONEXÃO --- */
 
         async function loadData() {
             toggleLoader(true);
@@ -407,20 +345,13 @@
                 if(!res.ok) throw new Error();
                 const json = await res.json();
                 globalData = json.record;
-
-                // ATUALIZA O currentUser com os dados mais recentes do servidor
                 if(currentUser) {
                     const u = globalData.users.find(x => x.user === currentUser.user);
                     if(u) {
-                        // Persiste o objeto completo e atualizado
-                        currentUser = u; 
+                        currentUser = u;
                         if(!currentUser.role) currentUser.role = currentUser.pix ? 'seller' : 'buyer';
                         localStorage.setItem('darkUserProMobile', JSON.stringify(currentUser));
                         updateSidebarUI();
-                    } else {
-                         // Se o usuário não for encontrado no banco (ex: deletado)
-                        logout(); 
-                        return;
                     }
                 }
                 renderShop();
@@ -438,8 +369,6 @@
             finally { toggleLoader(false); }
         }
 
-        /* --- FUNÇÕES DE AUTENTICAÇÃO E PERFIL --- */
-        
         function toggleSellerInputs() {
             const check = document.getElementById('r-is-seller').checked;
             const div = document.getElementById('seller-inputs');
@@ -450,8 +379,7 @@
             const u = document.getElementById('l-user').value;
             const p = document.getElementById('l-pass').value;
             toggleLoader(true);
-            // Carrega os dados antes de tentar logar
-            await loadData(); 
+            await loadData();
             const found = globalData.users.find(x => x.user === u && x.pass === p);
             if(found) {
                 currentUser = found;
@@ -468,7 +396,7 @@
             const p = document.getElementById('r-pass').value;
             const isSeller = document.getElementById('r-is-seller').checked;
             
-            if(!u || !p) return showToast("Preencha usuário e senha");
+            if(!u || !p) return showToast("Preencha tudo");
             let pix='', wpp='';
             if(isSeller) {
                 pix = document.getElementById('r-pix').value;
@@ -503,7 +431,7 @@
             const idx = globalData.users.findIndex(x => x.user === currentUser.user);
             if(idx !== -1) {
                 if(av) globalData.users[idx].avatar = av;
-                globalData.users[idx].pix = px; 
+                globalData.users[idx].pix = px;
                 globalData.users[idx].wpp = wp;
                 globalData.users[idx].bio = bi;
                 if(await saveData()) {
@@ -523,26 +451,16 @@
             document.getElementById('edit-avatar').value = currentUser.avatar || '';
             document.getElementById('prof-avatar-preview').src = currentUser.avatar;
 
-            const isSeller = currentUser.role === 'seller';
-            const sellerFields = document.querySelectorAll('.seller-only-field');
-            const sellerArea = document.getElementById('seller-products-area');
+            const area = document.getElementById('seller-products-area');
+            if(currentUser.role !== 'seller') { area.classList.add('hidden'); return; }
+            area.classList.remove('hidden');
 
-            if (isSeller) {
-                sellerArea.classList.remove('hidden');
-                sellerFields.forEach(field => field.classList.remove('hidden'));
-            } else {
-                sellerArea.classList.add('hidden');
-                sellerFields.forEach(field => field.classList.add('hidden'));
-                return; 
-            }
-
-            const myGrid = document.getElementById('my-products-grid');
-            myGrid.innerHTML = '';
+            const grid = document.getElementById('my-products-grid');
+            grid.innerHTML = '';
             const my = globalData.products.filter(p => p.seller === currentUser.user);
-            
-            if(!my.length) myGrid.innerHTML = '<p style="color:#777">Sem produtos.</p>';
+            if(!my.length) grid.innerHTML = '<p style="color:#777">Sem produtos.</p>';
             my.forEach(p => {
-                myGrid.innerHTML += `
+                grid.innerHTML += `
                     <div class="card">
                         <img src="${p.img}" class="card-img" onerror="this.src='https://via.placeholder.com/300'">
                         <div class="card-body">
@@ -554,8 +472,6 @@
                 `;
             });
         }
-        
-        /* --- FUNÇÕES DE LOJA E PRODUTO --- */
 
         function renderShop() {
             const grid = document.getElementById('products-grid');
@@ -569,11 +485,10 @@
                 const av = u.avatar || 'https://ui-avatars.com/api/?name='+p.seller;
                 const pix = u.pix || p.sellerPix;
                 const wpp = u.wpp || p.sellerWpp;
-
                 
                 grid.innerHTML += `
                     <div class="card">
-                        <img src="${p.img}" class="card-img" onclick="openProductDetail(${p.id})" style="cursor: pointer;" onerror="this.src='https://via.placeholder.com/300'">
+                        <img src="${p.img}" class="card-img" onerror="this.src='https://via.placeholder.com/300'">
                         <div class="card-body">
                             <div style="display:flex; gap:10px; align-items:center; margin-bottom:5px">
                                 <img src="${av}" style="width:25px; height:25px; border-radius:50%">
@@ -582,10 +497,9 @@
                             <h3>${p.name}</h3>
                             <p class="card-price">R$ ${p.price}</p>
                             <p class="card-desc">${p.desc}</p>
-                            
                             <div class="card-actions">
-                                <button onclick="copy('${pix}')" class="btn btn-primary" style="flex:1" ${!pix ? 'disabled' : ''}>Pix</button>
-                                <button onclick="window.open('https://wa.me/${wpp}')" class="btn btn-accent" style="flex:1" ${!wpp ? 'disabled' : ''}>Wpp</button>
+                                <button onclick="copy('${pix}')" class="btn btn-primary" style="flex:1">Pix</button>
+                                <button onclick="window.open('https://wa.me/${wpp}')" class="btn btn-accent" style="flex:1">Wpp</button>
                             </div>
                         </div>
                     </div>
@@ -594,7 +508,7 @@
         }
 
         async function postProduct() {
-            if(currentUser.role !== 'seller') return showToast("Apenas vendedores podem anunciar.");
+            if(currentUser.role !== 'seller') return showToast("Apenas vendedores");
             const n = document.getElementById('p-name').value;
             const i = document.getElementById('p-img').value;
             const pr = document.getElementById('p-price').value;
@@ -603,16 +517,7 @@
             
             toggleLoader(true);
             await loadData();
-            
-            globalData.products.push({ 
-                id: Date.now(), 
-                seller: currentUser.user, 
-                name: n, img: i, price: pr, desc: d,
-                sellerPix: currentUser.pix, 
-                sellerWpp: currentUser.wpp
-                // reviews: [] REMOVIDO
-            });
-
+            globalData.products.push({ id: Date.now(), seller: currentUser.user, name: n, img: i, price: pr, desc: d });
             if(await saveData()) {
                 showToast("Publicado!");
                 document.getElementById('p-name').value='';
@@ -628,24 +533,18 @@
             globalData.products = globalData.products.filter(p => p.id !== id);
             if(await saveData()) { showToast("Deletado"); renderProfilePage(); }
         }
-        
+
         function renderSellerProfile(name) {
             const u = globalData.users.find(x => x.user === name);
             if(!u) return showToast("Vendedor não encontrado");
-            
             navTo('seller-profile');
             document.getElementById('seller-profile-name').innerText = name;
-            
             const av = u.avatar || 'https://ui-avatars.com/api/?name='+name;
             document.getElementById('seller-info').innerHTML = `
                 <img src="${av}" class="avatar-circle" style="width:80px; height:80px;">
                 <div style="flex:1">
                     <h3 style="margin-bottom:5px">${name}</h3>
                     <p style="color:#aaa; font-size:0.9rem">${u.bio || 'Sem bio'}</p>
-                    <div style="display:flex; gap:15px; font-size: 0.9rem; margin-top: 10px;">
-                        <span style="color:var(--accent);"><i class="fas fa-qrcode"></i> PIX: ${u.pix ? 'Cadastrado' : 'Não Informado'}</span>
-                        <span style="color:var(--accent);"><i class="fab fa-whatsapp"></i> WPP: ${u.wpp ? 'Cadastrado' : 'Não Informado'}</span>
-                    </div>
                 </div>
             `;
             const grid = document.getElementById('seller-products-grid');
@@ -653,77 +552,38 @@
             const list = globalData.products.filter(p => p.seller === name);
             if(!list.length) grid.innerHTML = '<p>Sem produtos</p>';
             list.forEach(p => {
-                
                 grid.innerHTML += `
                 <div class="card">
-                    <img src="${p.img}" class="card-img" onclick="openProductDetail(${p.id})" style="cursor: pointer;" onerror="this.src='https://via.placeholder.com/300'">
+                    <img src="${p.img}" class="card-img" onerror="this.src='https://via.placeholder.com/300'">
                     <div class="card-body">
                         <h4>${p.name}</h4>
                         <p class="card-price">R$ ${p.price}</p>
-                        
                         <div class="card-actions">
-                            <button onclick="copy('${u.pix}')" class="btn btn-primary" style="flex:1" ${!u.pix ? 'disabled' : ''}>Pix</button>
-                            <button onclick="window.open('https://wa.me/${u.wpp}')" class="btn btn-accent" style="flex:1" ${!u.wpp ? 'disabled' : ''}>Wpp</button>
+                            <button onclick="copy('${u.pix}')" class="btn btn-primary" style="flex:1">Pix</button>
+                            <button onclick="window.open('https://wa.me/${u.wpp}')" class="btn btn-accent" style="flex:1">Wpp</button>
                         </div>
                     </div>
                 </div>`;
             });
         }
 
-
-        /* --- FUNÇÕES DO MODAL DE DETALHES --- */
-
-        function openProductDetail(id) {
-            const product = globalData.products.find(p => p.id === id);
-            if (!product) return showToast("Produto não encontrado.");
-            
-            currentProductId = id;
-            
-            document.getElementById('modal-product-name').innerText = product.name;
-            document.getElementById('modal-product-img').src = product.img || 'https://via.placeholder.com/300';
-            document.getElementById('modal-product-price').innerText = `R$ ${product.price}`;
-            document.getElementById('modal-product-desc').innerText = product.desc;
-            
-            const sellerLink = document.getElementById('modal-seller-link');
-            sellerLink.innerText = product.seller;
-            sellerLink.onclick = () => { closeProductDetail(); renderSellerProfile(product.seller); };
-            
-            document.getElementById('product-detail-modal').classList.remove('hidden');
-        }
-
-        function closeProductDetail() {
-            document.getElementById('product-detail-modal').classList.add('hidden');
-            currentProductId = null;
-        }
-
-        /* --- FUNÇÕES DE NAVEGAÇÃO E UTILITÁRIOS --- */
-        
         function navTo(screen) {
             ['view-shop','view-sell','view-profile','view-seller-profile'].forEach(id=>document.getElementById(id).classList.add('hidden'));
             document.querySelectorAll('.nav-menu button').forEach(b=>b.classList.remove('active'));
             document.getElementById('view-'+screen).classList.remove('hidden');
             if(screen==='shop') document.getElementById('btn-shop').classList.add('active');
             if(screen==='sell') document.getElementById('nav-btn-sell').classList.add('active');
-            if(screen==='profile') {
-                document.querySelectorAll('.nav-menu button')[2].classList.add('active'); 
-                renderProfilePage();
-            }
+            if(screen==='profile') renderProfilePage();
             document.querySelector('.nav-menu').classList.remove('mobile-open');
             if(screen!=='shop') document.getElementById('search-container').classList.add('hidden');
         }
-
         function toggleSearch() {
             const s = document.getElementById('search-container');
             navTo('shop');
             s.classList.toggle('hidden');
-            document.getElementById('search-term').focus(); // Adiciona foco para melhor usabilidade
         }
         function previewAvatar(url) { if(url) document.getElementById('prof-avatar-preview').src=url; }
-        function showApp() { 
-            document.getElementById('auth-overlay').classList.add('hidden'); 
-            document.getElementById('app-shell').classList.remove('hidden'); 
-            updateSidebarUI(); 
-        }
+        function showApp() { document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('app-shell').classList.remove('hidden'); updateSidebarUI(); }
         function updateSidebarUI() {
             document.getElementById('sb-name').innerText = currentUser.user;
             const btn = document.getElementById('nav-btn-sell');
@@ -738,6 +598,7 @@
         function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
         function copy(t) { if(!t) return showToast("Sem dado"); navigator.clipboard.writeText(t); showToast("Copiado"); }
 
+        init();
     </script>
 </body>
-</html>
+                                        </html>
