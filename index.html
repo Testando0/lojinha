@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkMarket Pro Mobile FIXED</title>
+    <title>DarkMarket Pro Mobile - Sem Avaliações</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> 
     <style>
-        /* (*** O CSS COMPLETO PERMANECE INALTERADO ***) */
+        /* --- CSS: VARIÁVEIS E ESTILOS GERAIS --- */
         :root {
             --bg-body: #121212;
             --bg-sidebar: #1a1a1a;
@@ -93,7 +93,7 @@
         main { 
             flex: 1; 
             padding: 30px; 
-            padding-bottom: 100px; 
+            padding-bottom: 100px;
             overflow-y: auto; 
             position: relative; 
         }
@@ -122,7 +122,7 @@
         .profile-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .full-width { grid-column: span 2; }
 
-        /* --- MODAL DE DETALHES E AVALIAÇÕES --- */
+        /* --- MODAL DE DETALHES (Sem Avaliações) --- */
         #product-detail-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); z-index: 1000;
@@ -136,27 +136,6 @@
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-close { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
-
-        /* Estrelas */
-        .rating-stars { font-size: 1.5rem; color: #ffc107; margin-bottom: 10px; }
-        .rating-stars i { cursor: pointer; transition: color 0.2s; }
-        .rating-stars i.far { color: var(--border); } /* Estrela vazia */
-        .average-rating { font-size: 1.8rem; font-weight: bold; margin-bottom: 15px; color: var(--accent); }
-        .review-form-area { 
-            padding: 20px; 
-            border: 1px solid var(--primary); 
-            border-radius: 8px; 
-            margin-top: 30px; 
-            margin-bottom: 30px; 
-            background: rgba(187, 134, 252, 0.05);
-        }
-
-        /* Revisões */
-        .review-item { padding: 15px 0; border-top: 1px solid var(--border); }
-        .review-item:first-child { border-top: none; }
-        .review-user { font-weight: bold; color: var(--primary); margin-bottom: 5px; }
-        .review-meta { font-size: 0.8rem; color: var(--text-muted); }
-        .review-comment { margin-top: 5px; font-style: italic; }
 
 
         /* LOADING & TOAST */
@@ -177,7 +156,7 @@
         }
         .checkbox-wrapper input { margin: 0; width: 20px; height: 20px; }
 
-        /* --- MOBILE RESPONSIVO (CORREÇÕES) --- */
+        /* --- MOBILE RESPONSIVO --- */
         @media(max-width: 768px) {
             body { flex-direction: column; height: 100vh; overflow: hidden; }
             
@@ -206,7 +185,7 @@
             #btn-search-toggle span { display: none; } 
             .mobile-toggle { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; border: 1px solid var(--border); border-radius: 6px; }
 
-            /* CORREÇÃO DO CONTEÚDO PRINCIPAL */
+            /* CONTEÚDO PRINCIPAL */
             main { 
                 padding: 15px; 
                 padding-bottom: 80px; 
@@ -214,7 +193,7 @@
                 height: calc(100vh - 60px); 
             }
 
-            /* CORREÇÃO DA TELA DE PERFIL */
+            /* TELA DE PERFIL */
             .profile-header { 
                 flex-direction: column; 
                 align-items: center; 
@@ -231,12 +210,12 @@
             }
             .full-width { width: 100%; }
             
-            /* CORREÇÃO DO GRID DE PRODUTOS */
+            /* GRID DE PRODUTOS */
             .grid { 
                 grid-template-columns: 1fr; 
             }
             
-            /* Ajuste nos inputs do perfil para não estourarem */
+            /* Ajuste nos inputs do perfil */
             input, textarea { width: 100%; box-sizing: border-box; }
         }
 
@@ -380,8 +359,7 @@
             <div style="display:flex; gap: 20px; flex-wrap: wrap;">
                 <img id="modal-product-img" style="width: 100%; max-width: 300px; height: 300px; object-fit: cover; border-radius: 8px;">
                 <div style="flex: 1; min-width: 250px;">
-                    <p class="average-rating" id="modal-avg-rating"></p>
-                    <p style="font-size: 1.5rem; color: var(--accent); font-weight: bold;" id="modal-product-price"></p>
+                    <p style="font-size: 1.5rem; color: var(--accent); font-weight: bold; margin-bottom: 15px;" id="modal-product-price"></p>
                     <p style="color:var(--text-muted); margin-top: 10px;" id="modal-product-desc"></p>
                     <div style="margin-top: 20px;">
                         <span style="font-weight: bold; color: var(--primary);">Vendedor: </span>
@@ -389,26 +367,7 @@
                     </div>
                 </div>
             </div>
-
-            <div class="review-form-area" id="review-form-area">
-                <h4 style="margin-bottom: 10px; color: var(--primary);">Deixe sua Avaliação</h4>
-                <div id="rating-input" class="rating-stars">
-                    <i class="far fa-star" data-rating="1"></i>
-                    <i class="far fa-star" data-rating="2"></i>
-                    <i class="far fa-star" data-rating="3"></i>
-                    <i class="far fa-star" data-rating="4"></i>
-                    <i class="far fa-star" data-rating="5"></i>
-                </div>
-                <textarea id="review-comment" rows="3" placeholder="Seu comentário (opcional)"></textarea>
-                <button onclick="submitReview()" class="btn btn-primary" style="width:100%"><i class="fas fa-paper-plane"></i> Enviar Avaliação</button>
-                <p id="review-status" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;"></p>
             </div>
-
-            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--border);">Avaliações dos Compradores (<span id="review-count">0</span>)</h3>
-            <div id="reviews-list">
-                <p style="color:#777; margin-top:10px;">Ainda não há avaliações.</p>
-            </div>
-        </div>
     </div>
 
 
@@ -420,8 +379,7 @@
         
         let globalData = { users: [], products: [] };
         let currentUser = null;
-        let currentProductId = null;
-        let currentRating = 0;
+        let currentProductId = null; // Mantido para referência ao produto no modal
 
         function init() {
             const session = localStorage.getItem('darkUserProMobile'); 
@@ -433,6 +391,7 @@
         }
 
         /* --- FUNÇÕES DE DADOS E CONEXÃO --- */
+
         async function loadData() {
             toggleLoader(true);
             try {
@@ -464,6 +423,8 @@
             finally { toggleLoader(false); }
         }
 
+        /* --- FUNÇÕES DE AUTENTICAÇÃO E PERFIL --- */
+        
         function toggleSellerInputs() {
             const check = document.getElementById('r-is-seller').checked;
             const div = document.getElementById('seller-inputs');
@@ -578,6 +539,8 @@
             });
         }
         
+        /* --- FUNÇÕES DE LOJA E PRODUTO --- */
+
         function renderShop() {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '';
@@ -591,8 +554,6 @@
                 const pix = u.pix || p.sellerPix;
                 const wpp = u.wpp || p.sellerWpp;
 
-                const avgRating = calculateAverageRating(p.reviews);
-                const ratingHtml = getStarHTML(avgRating.score, 1);
                 
                 grid.innerHTML += `
                     <div class="card">
@@ -605,9 +566,7 @@
                             <h3>${p.name}</h3>
                             <p class="card-price">R$ ${p.price}</p>
                             <p class="card-desc">${p.desc}</p>
-                            <div style="margin-bottom: 10px; font-size: 0.9rem;">
-                                ${ratingHtml} (${avgRating.count})
-                            </div>
+                            
                             <div class="card-actions">
                                 <button onclick="copy('${pix}')" class="btn btn-primary" style="flex:1" ${!pix ? 'disabled' : ''}>Pix</button>
                                 <button onclick="window.open('https://wa.me/${wpp}')" class="btn btn-accent" style="flex:1" ${!wpp ? 'disabled' : ''}>Wpp</button>
@@ -634,8 +593,7 @@
                 seller: currentUser.user, 
                 name: n, img: i, price: pr, desc: d,
                 sellerPix: currentUser.pix, 
-                sellerWpp: currentUser.wpp,
-                reviews: []
+                sellerWpp: currentUser.wpp
             });
 
             if(await saveData()) {
@@ -678,8 +636,6 @@
             const list = globalData.products.filter(p => p.seller === name);
             if(!list.length) grid.innerHTML = '<p>Sem produtos</p>';
             list.forEach(p => {
-                const avgRating = calculateAverageRating(p.reviews);
-                const ratingHtml = getStarHTML(avgRating.score, 1);
                 
                 grid.innerHTML += `
                 <div class="card">
@@ -687,9 +643,7 @@
                     <div class="card-body">
                         <h4>${p.name}</h4>
                         <p class="card-price">R$ ${p.price}</p>
-                        <div style="margin-bottom: 10px; font-size: 0.9rem;">
-                            ${ratingHtml} (${avgRating.count})
-                        </div>
+                        
                         <div class="card-actions">
                             <button onclick="copy('${u.pix}')" class="btn btn-primary" style="flex:1" ${!u.pix ? 'disabled' : ''}>Pix</button>
                             <button onclick="window.open('https://wa.me/${u.wpp}')" class="btn btn-accent" style="flex:1" ${!u.wpp ? 'disabled' : ''}>Wpp</button>
@@ -700,97 +654,13 @@
         }
 
 
-        /* --- FUNÇÕES DO MODAL DE DETALHES E AVALIAÇÕES --- */
-
-        function getStarHTML(rating, size = 1) {
-            let html = '';
-            const roundedRating = Math.round(rating * 2) / 2;
-            for (let i = 1; i <= 5; i++) {
-                if (i <= roundedRating) {
-                    html += `<i class="fas fa-star" style="font-size: ${size}rem;"></i>`;
-                } else if (i - 0.5 === roundedRating) {
-                    html += `<i class="fas fa-star-half-alt" style="font-size: ${size}rem;"></i>`;
-                } else {
-                    html += `<i class="far fa-star" style="font-size: ${size}rem;"></i>`;
-                }
-            }
-            return html;
-        }
-
-        function calculateAverageRating(reviews) {
-            if (!reviews || reviews.length === 0) return { score: 0, count: 0 };
-            const total = reviews.reduce((sum, r) => sum + r.rating, 0);
-            return {
-                score: (total / reviews.length).toFixed(1),
-                count: reviews.length
-            };
-        }
-        
-        // 🌟 FUNÇÃO DE CONFIGURAÇÃO DE EVENTOS OTIMIZADA PARA MOBILE (FIXED) 🌟
-        function setupRatingInput() {
-            const ratingInput = document.getElementById('rating-input');
-            
-            if (!ratingInput) {
-                console.warn("Elemento #rating-input não encontrado para configurar eventos.");
-                return; 
-            }
-
-            // Função unificada para tratar toque/clique
-            const handleStarInteraction = (event) => {
-                event.preventDefault(); // Previne o comportamento padrão (ex: delay do clique)
-                
-                const star = event.target.closest('i'); 
-                
-                if (star && star.hasAttribute('data-rating')) {
-                    currentRating = parseInt(star.getAttribute('data-rating'));
-                    highlightStars(currentRating);
-                }
-            };
-
-            // 1. EVENTO DE TOQUE (Ideal para Celulares)
-            // Usamos { passive: false } para permitir o preventDefault e evitar scroll acidental.
-            ratingInput.addEventListener('touchstart', handleStarInteraction, { passive: false });
-            
-            // 2. EVENTO DE CLIQUE (Para PC e fallback)
-            ratingInput.addEventListener('click', handleStarInteraction, { passive: false });
-            
-            // 3. EVENTOS DE MOUSE (Para visualização em PC)
-            ratingInput.addEventListener('mouseover', (event) => {
-                const star = event.target.closest('i');
-                if (star && star.hasAttribute('data-rating')) {
-                    highlightStars(parseInt(star.getAttribute('data-rating')));
-                }
-            });
-
-            ratingInput.addEventListener('mouseout', () => {
-                highlightStars(currentRating);
-            });
-            
-            highlightStars(0); 
-        }
-
-        function highlightStars(rating) {
-            const stars = document.querySelectorAll('#rating-input i');
-            stars.forEach(star => {
-                const starRating = parseInt(star.getAttribute('data-rating'));
-                if (starRating <= rating) {
-                    star.classList.remove('far');
-                    star.classList.add('fas');
-                } else {
-                    star.classList.remove('fas');
-                    star.classList.add('far');
-                }
-            });
-        }
+        /* --- FUNÇÕES DO MODAL DE DETALHES --- */
 
         function openProductDetail(id) {
-            if (!currentUser) return showToast("Faça login para ver os detalhes e avaliar.");
-
             const product = globalData.products.find(p => p.id === id);
             if (!product) return showToast("Produto não encontrado.");
             
             currentProductId = id;
-            currentRating = 0; 
             
             document.getElementById('modal-product-name').innerText = product.name;
             document.getElementById('modal-product-img').src = product.img || 'https://via.placeholder.com/300';
@@ -800,96 +670,17 @@
             const sellerLink = document.getElementById('modal-seller-link');
             sellerLink.innerText = product.seller;
             sellerLink.onclick = () => { closeProductDetail(); renderSellerProfile(product.seller); };
-
-            renderReviews(product.reviews);
-
-            const existingReview = product.reviews.find(r => r.user === currentUser.user);
-            const reviewFormArea = document.getElementById('review-form-area');
-            const reviewStatus = document.getElementById('review-status');
-
-            if (existingReview) {
-                reviewFormArea.classList.add('hidden');
-                reviewStatus.style.color = 'var(--accent)';
-                reviewStatus.innerHTML = `Você já avaliou este produto em **${existingReview.rating} estrelas**.<br>Seu comentário: "${existingReview.comment}"`;
-            } else if (product.seller === currentUser.user) {
-                reviewFormArea.classList.add('hidden');
-                reviewStatus.style.color = 'var(--danger)';
-                reviewStatus.innerText = "Você não pode avaliar seu próprio produto.";
-            } else {
-                reviewFormArea.classList.remove('hidden');
-                reviewStatus.innerText = '';
-                document.getElementById('review-comment').value = '';
-                highlightStars(0); 
-            }
-
+            
             document.getElementById('product-detail-modal').classList.remove('hidden');
         }
 
         function closeProductDetail() {
             document.getElementById('product-detail-modal').classList.add('hidden');
             currentProductId = null;
-            currentRating = 0;
-            highlightStars(0);
-        }
-
-        function renderReviews(reviews) {
-            const reviewListDiv = document.getElementById('reviews-list');
-            const avgRating = calculateAverageRating(reviews);
-
-            document.getElementById('review-count').innerText = avgRating.count;
-            document.getElementById('modal-avg-rating').innerHTML = `${avgRating.score} ${getStarHTML(avgRating.score, 1)} (${avgRating.count} avaliações)`;
-            
-            reviewListDiv.innerHTML = '';
-
-            if (reviews.length === 0) {
-                reviewListDiv.innerHTML = '<p style="color:#777; margin-top:10px;">Ainda não há avaliações.</p>';
-                return;
-            }
-
-            reviews.slice().reverse().forEach(r => {
-                reviewListDiv.innerHTML += `
-                    <div class="review-item">
-                        <div class="review-meta">
-                            ${getStarHTML(r.rating, 1)}
-                            <span style="float:right;">${new Date(r.date).toLocaleDateString()}</span>
-                        </div>
-                        <div class="review-user">${r.user}</div>
-                        <p class="review-comment">${r.comment || 'Nenhum comentário.'}</p>
-                    </div>
-                `;
-            });
-        }
-
-        async function submitReview() {
-            if (!currentProductId) return;
-            if (currentRating === 0) return showToast("Selecione de 1 a 5 estrelas!");
-            
-            const comment = document.getElementById('review-comment').value;
-            
-            toggleLoader(true);
-            await loadData();
-            
-            const product = globalData.products.find(p => p.id === currentProductId);
-            if (!product) { toggleLoader(false); return showToast("Produto não encontrado."); }
-
-            const existing = product.reviews.find(r => r.user === currentUser.user);
-            if (existing) { toggleLoader(false); return showToast("Você já avaliou este produto."); }
-
-            product.reviews.push({
-                user: currentUser.user,
-                rating: currentRating,
-                comment: comment,
-                date: Date.now()
-            });
-
-            if (await saveData()) {
-                showToast("Avaliação enviada!");
-                openProductDetail(currentProductId); 
-                renderShop(); 
-            }
         }
 
         /* --- FUNÇÕES DE NAVEGAÇÃO E UTILITÁRIOS --- */
+        
         function navTo(screen) {
             ['view-shop','view-sell','view-profile','view-seller-profile'].forEach(id=>document.getElementById(id).classList.add('hidden'));
             document.querySelectorAll('.nav-menu button').forEach(b=>b.classList.remove('active'));
@@ -910,13 +701,7 @@
             s.classList.toggle('hidden');
         }
         function previewAvatar(url) { if(url) document.getElementById('prof-avatar-preview').src=url; }
-        function showApp() { 
-            document.getElementById('auth-overlay').classList.add('hidden'); 
-            document.getElementById('app-shell').classList.remove('hidden'); 
-            updateSidebarUI(); 
-            // 🌟 CHAMADA DE CONFIGURAÇÃO DO INPUT DE AVALIAÇÃO AGORA AQUI 🌟
-            setupRatingInput(); 
-        }
+        function showApp() { document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('app-shell').classList.remove('hidden'); updateSidebarUI(); }
         function updateSidebarUI() {
             document.getElementById('sb-name').innerText = currentUser.user;
             const btn = document.getElementById('nav-btn-sell');
