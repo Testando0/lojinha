@@ -90,7 +90,13 @@
         }
 
         /* --- CONTEÚDO PRINCIPAL --- */
-        main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        main { 
+            flex: 1; 
+            padding: 30px; 
+            padding-bottom: 60px; /* CORREÇÃO: Adiciona espaço extra para o scroll */
+            overflow-y: auto; 
+            position: relative; 
+        }
         
         h2 { font-size: 1.8rem; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 
@@ -201,7 +207,12 @@
             .mobile-toggle { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; border: 1px solid var(--border); border-radius: 6px; }
 
             /* CORREÇÃO DO CONTEÚDO PRINCIPAL */
-            main { padding: 15px; overflow-y: auto; height: calc(100vh - 60px); }
+            main { 
+                padding: 15px; 
+                padding-bottom: 40px; /* CORREÇÃO: Adiciona espaço extra para o scroll em mobile */
+                overflow-y: auto; 
+                height: calc(100vh - 60px); 
+            }
 
             /* CORREÇÃO DA TELA DE PERFIL */
             .profile-header { 
@@ -649,7 +660,6 @@
             if(await saveData()) { showToast("Deletado"); renderProfilePage(); }
         }
         
-        // --- NOVO: FUNÇÃO renderSellerProfile RESTAURADA ---
         function renderSellerProfile(name) {
             const u = globalData.users.find(x => x.user === name);
             if(!u) return showToast("Vendedor não encontrado");
@@ -694,7 +704,6 @@
                 </div>`;
             });
         }
-        // --- FIM CORREÇÃO renderSellerProfile ---
 
 
         /* --- FUNÇÕES DO MODAL DE DETALHES E AVALIAÇÕES --- */
@@ -857,7 +866,6 @@
 
         /* --- FUNÇÕES DE NAVEGAÇÃO E UTILITÁRIOS --- */
         
-        // --- NOVO: FUNÇÃO navTo CORRIGIDA/RESTAURADA ---
         function navTo(screen) {
             // Esconde todas as seções de conteúdo
             ['view-shop','view-sell','view-profile','view-seller-profile'].forEach(id=>document.getElementById(id).classList.add('hidden'));
@@ -874,7 +882,7 @@
             
             // Funções específicas ao navegar
             if(screen==='profile') {
-                document.querySelectorAll('.nav-menu button')[2].classList.add('active'); // Marca o botão "Meu Perfil"
+                document.querySelectorAll('.nav-menu button')[2].classList.add('active'); 
                 renderProfilePage();
             }
             
@@ -884,7 +892,6 @@
             // Esconde a busca se não estiver na loja
             if(screen!=='shop') document.getElementById('search-container').classList.add('hidden');
         }
-        // --- FIM CORREÇÃO navTo ---
 
         function toggleSearch() {
             const s = document.getElementById('search-container');
