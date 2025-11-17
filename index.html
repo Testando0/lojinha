@@ -429,12 +429,10 @@
                 currentUser = JSON.parse(session);
                 showApp();
                 loadData();
-                // setupRatingInput será chamado no final do script
             }
         }
 
         /* --- FUNÇÕES DE DADOS E CONEXÃO --- */
-        // ... (Todas as funções de dados e autenticação permanecem inalteradas)
         async function loadData() {
             toggleLoader(true);
             try {
@@ -728,25 +726,34 @@
             };
         }
         
-        // 🌟 FUNÇÃO DE CONFIGURAÇÃO DE EVENTOS DELEGADOS (MAIS ROBUSTA) 🌟
+        // 🌟 FUNÇÃO DE CONFIGURAÇÃO DE EVENTOS OTIMIZADA PARA MOBILE 🌟
         function setupRatingInput() {
             const ratingInput = document.getElementById('rating-input');
             
             if (!ratingInput) {
-                console.warn("Elemento #rating-input não encontrado para configurar eventos.");
                 return; 
             }
 
-            // Delegação de evento de clique
-            ratingInput.addEventListener('click', (event) => {
+            // Função unificada para tratar toque/clique
+            const handleStarInteraction = (event) => {
+                // Previne o atraso do clique em mobile e possíveis conflitos
+                event.preventDefault(); 
+                
                 const star = event.target.closest('i'); 
+                
                 if (star && star.hasAttribute('data-rating')) {
                     currentRating = parseInt(star.getAttribute('data-rating'));
                     highlightStars(currentRating);
                 }
-            });
+            };
 
-            // Delegação de evento de mouseover (para visualização temporária)
+            // 1. EVENTO DE TOQUE (Ideal para Celulares)
+            ratingInput.addEventListener('touchstart', handleStarInteraction, { passive: false });
+            
+            // 2. EVENTO DE CLIQUE (Para compatibilidade com PC/navegadores que emulam toque)
+            ratingInput.addEventListener('click', handleStarInteraction, { passive: false });
+            
+            // 3. EVENTOS DE MOUSE (Apenas para visualização em PC, podem ser removidos no mobile)
             ratingInput.addEventListener('mouseover', (event) => {
                 const star = event.target.closest('i');
                 if (star && star.hasAttribute('data-rating')) {
@@ -754,10 +761,11 @@
                 }
             });
 
-            // Delegação de evento de mouseout (para voltar ao estado selecionado)
             ratingInput.addEventListener('mouseout', () => {
                 highlightStars(currentRating);
             });
+            
+            highlightStars(0); 
         }
 
         function highlightStars(rating) {
@@ -810,7 +818,7 @@
                 reviewFormArea.classList.remove('hidden');
                 reviewStatus.innerText = '';
                 document.getElementById('review-comment').value = '';
-                highlightStars(0); // Garante que começa com 0 estrelas selecionadas
+                highlightStars(0); 
             }
 
             document.getElementById('product-detail-modal').classList.remove('hidden');
@@ -881,7 +889,6 @@
         }
 
         /* --- FUNÇÕES DE NAVEGAÇÃO E UTILITÁRIOS --- */
-        // ... (Todas as funções utilitárias permanecem inalteradas)
         function navTo(screen) {
             ['view-shop','view-sell','view-profile','view-seller-profile'].forEach(id=>document.getElementById(id).classList.add('hidden'));
             document.querySelectorAll('.nav-menu button').forEach(b=>b.classList.remove('active'));
@@ -920,7 +927,7 @@
 
         // 🌟 CHAMADA FINAL PARA GARANTIR QUE O DOM ESTEJA CARREGADO 🌟
         document.addEventListener('DOMContentLoaded', () => {
-            setupRatingInput(); // Inicializa a lógica de eventos de clique nas estrelas
+            setupRatingInput(); // Inicializa a lógica de eventos de clique/toque nas estrelas
             init(); // Inicia o resto da aplicação
         });
     </script>
