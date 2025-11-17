@@ -409,9 +409,8 @@
         
         let globalData = { users: [], products: [] };
         let currentUser = null;
-        let currentProductId = null; // ID do produto aberto no modal
-        let currentRating = 0; // Avaliação selecionada pelo usuário (1-5)
-
+        let currentProductId = null;
+        let currentRating = 0;
 
         function init() {
             const session = localStorage.getItem('darkUserProMobile'); 
@@ -458,6 +457,12 @@
 
         /* --- FUNÇÕES DE AUTENTICAÇÃO E PERFIL --- */
         
+        function toggleSellerInputs() {
+            const check = document.getElementById('r-is-seller').checked;
+            const div = document.getElementById('seller-inputs');
+            check ? div.classList.remove('hidden') : div.classList.add('hidden');
+        }
+
         async function doLogin() {
             const u = document.getElementById('l-user').value;
             const p = document.getElementById('l-pass').value;
@@ -501,6 +506,31 @@
             if(await saveData()) { showToast("Criado! Faça login"); toggleAuth(); }
         }
 
+        function logout() { localStorage.removeItem('darkUserProMobile'); window.location.reload(); }
+
+        async function updateProfile() {
+            const av = document.getElementById('edit-avatar').value;
+            const px = document.getElementById('edit-pix').value;
+            const wp = document.getElementById('edit-wpp').value;
+            const bi = document.getElementById('edit-bio').value;
+
+            toggleLoader(true);
+            await loadData();
+            const idx = globalData.users.findIndex(x => x.user === currentUser.user);
+            if(idx !== -1) {
+                if(av) globalData.users[idx].avatar = av;
+                globalData.users[idx].pix = px; 
+                globalData.users[idx].wpp = wp;
+                globalData.users[idx].bio = bi;
+                if(await saveData()) {
+                    currentUser = globalData.users[idx];
+                    localStorage.setItem('darkUserProMobile', JSON.stringify(currentUser));
+                    updateSidebarUI();
+                    showToast("Salvo!");
+                }
+            }
+        }
+
         function renderProfilePage() {
             document.getElementById('edit-user').value = currentUser.user;
             document.getElementById('edit-pix').value = currentUser.pix || '';
@@ -541,9 +571,6 @@
             });
         }
         
-        // ... (outras funções de autenticação e perfil) ...
-
-
         /* --- FUNÇÕES DE LOJA E PRODUTO --- */
 
         function renderShop() {
@@ -559,7 +586,6 @@
                 const pix = u.pix || p.sellerPix;
                 const wpp = u.wpp || p.sellerWpp;
 
-                // Calcula avaliação média para mostrar no card
                 const avgRating = calculateAverageRating(p.reviews);
                 const ratingHtml = getStarHTML(avgRating.score, 1);
                 
@@ -598,14 +624,13 @@
             toggleLoader(true);
             await loadData();
             
-            // Inicializa a lista de reviews
             globalData.products.push({ 
                 id: Date.now(), 
                 seller: currentUser.user, 
                 name: n, img: i, price: pr, desc: d,
                 sellerPix: currentUser.pix, 
                 sellerWpp: currentUser.wpp,
-                reviews: [] // NOVO: Inicializa array de avaliações
+                reviews: []
             });
 
             if(await saveData()) {
@@ -615,7 +640,63 @@
                 navTo('shop');
             }
         }
+
+        async function deleteProduct(id) {
+            if(!confirm("Excluir?")) return;
+            toggleLoader(true);
+            await loadData();
+            globalData.products = globalData.products.filter(p => p.id !== id);
+            if(await saveData()) { showToast("Deletado"); renderProfilePage(); }
+        }
         
+        // --- NOVO: FUNÇÃO renderSellerProfile RESTAURADA ---
+        function renderSellerProfile(name) {
+            const u = globalData.users.find(x => x.user === name);
+            if(!u) return showToast("Vendedor não encontrado");
+            
+            navTo('seller-profile');
+            document.getElementById('seller-profile-name').innerText = name;
+            
+            const av = u.avatar || 'https://ui-avatars.com/api/?name='+name;
+            document.getElementById('seller-info').innerHTML = `
+                <img src="${av}" class="avatar-circle" style="width:80px; height:80px;">
+                <div style="flex:1">
+                    <h3 style="margin-bottom:5px">${name}</h3>
+                    <p style="color:#aaa; font-size:0.9rem">${u.bio || 'Sem bio'}</p>
+                    <div style="display:flex; gap:15px; font-size: 0.9rem; margin-top: 10px;">
+                        <span style="color:var(--accent);"><i class="fas fa-qrcode"></i> PIX: ${u.pix ? 'Cadastrado' : 'Não Informado'}</span>
+                        <span style="color:var(--accent);"><i class="fab fa-whatsapp"></i> WPP: ${u.wpp ? 'Cadastrado' : 'Não Informado'}</span>
+                    </div>
+                </div>
+            `;
+            const grid = document.getElementById('seller-products-grid');
+            grid.innerHTML = '';
+            const list = globalData.products.filter(p => p.seller === name);
+            if(!list.length) grid.innerHTML = '<p>Sem produtos</p>';
+            list.forEach(p => {
+                const avgRating = calculateAverageRating(p.reviews);
+                const ratingHtml = getStarHTML(avgRating.score, 1);
+                
+                grid.innerHTML += `
+                <div class="card">
+                    <img src="${p.img}" class="card-img" onclick="openProductDetail(${p.id})" style="cursor: pointer;" onerror="this.src='https://via.placeholder.com/300'">
+                    <div class="card-body">
+                        <h4>${p.name}</h4>
+                        <p class="card-price">R$ ${p.price}</p>
+                        <div style="margin-bottom: 10px; font-size: 0.9rem;">
+                            ${ratingHtml} (${avgRating.count})
+                        </div>
+                        <div class="card-actions">
+                            <button onclick="copy('${u.pix}')" class="btn btn-primary" style="flex:1" ${!u.pix ? 'disabled' : ''}>Pix</button>
+                            <button onclick="window.open('https://wa.me/${u.wpp}')" class="btn btn-accent" style="flex:1" ${!u.wpp ? 'disabled' : ''}>Wpp</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+        // --- FIM CORREÇÃO renderSellerProfile ---
+
+
         /* --- FUNÇÕES DO MODAL DE DETALHES E AVALIAÇÕES --- */
 
         function getStarHTML(rating, size = 1) {
@@ -687,10 +768,8 @@
             sellerLink.innerText = product.seller;
             sellerLink.onclick = () => { closeProductDetail(); renderSellerProfile(product.seller); };
 
-            // Renderiza Avaliações
             renderReviews(product.reviews);
 
-            // Verifica se o usuário já avaliou
             const existingReview = product.reviews.find(r => r.user === currentUser.user);
             const reviewFormArea = document.getElementById('review-form-area');
             const reviewStatus = document.getElementById('review-status');
@@ -709,7 +788,6 @@
                 document.getElementById('review-comment').value = '';
                 highlightStars(0);
             }
-
 
             document.getElementById('product-detail-modal').classList.remove('hidden');
         }
@@ -760,7 +838,6 @@
             const product = globalData.products.find(p => p.id === currentProductId);
             if (!product) { toggleLoader(false); return showToast("Produto não encontrado."); }
 
-            // Checa novamente para evitar duplicidade
             const existing = product.reviews.find(r => r.user === currentUser.user);
             if (existing) { toggleLoader(false); return showToast("Você já avaliou este produto."); }
 
@@ -773,33 +850,49 @@
 
             if (await saveData()) {
                 showToast("Avaliação enviada!");
-                // Recarrega o modal para mostrar a nova avaliação
                 openProductDetail(currentProductId); 
-                // Recarrega a loja para atualizar a média no card
                 renderShop(); 
             }
         }
 
-        /* --- UTILITY FUNCTIONS --- */
-
-        function toggleSellerInputs() {
-            const check = document.getElementById('r-is-seller').checked;
-            const div = document.getElementById('seller-inputs');
-            check ? div.classList.remove('hidden') : div.classList.add('hidden');
+        /* --- FUNÇÕES DE NAVEGAÇÃO E UTILITÁRIOS --- */
+        
+        // --- NOVO: FUNÇÃO navTo CORRIGIDA/RESTAURADA ---
+        function navTo(screen) {
+            // Esconde todas as seções de conteúdo
+            ['view-shop','view-sell','view-profile','view-seller-profile'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+            
+            // Remove o estado "ativo" de todos os botões de navegação
+            document.querySelectorAll('.nav-menu button').forEach(b=>b.classList.remove('active'));
+            
+            // Mostra a seção desejada
+            document.getElementById('view-'+screen).classList.remove('hidden');
+            
+            // Marca o botão de navegação como ativo
+            if(screen==='shop') document.getElementById('btn-shop').classList.add('active');
+            if(screen==='sell') document.getElementById('nav-btn-sell').classList.add('active');
+            
+            // Funções específicas ao navegar
+            if(screen==='profile') {
+                document.querySelectorAll('.nav-menu button')[2].classList.add('active'); // Marca o botão "Meu Perfil"
+                renderProfilePage();
+            }
+            
+            // Fecha o menu mobile (se estiver aberto)
+            document.querySelector('.nav-menu').classList.remove('mobile-open');
+            
+            // Esconde a busca se não estiver na loja
+            if(screen!=='shop') document.getElementById('search-container').classList.add('hidden');
         }
+        // --- FIM CORREÇÃO navTo ---
 
-        function logout() { localStorage.removeItem('darkUserProMobile'); window.location.reload(); }
-        function toggleAuth() { document.getElementById('login-box').classList.toggle('hidden'); document.getElementById('register-box').classList.toggle('hidden'); }
-        function toggleMobileMenu() { document.querySelector('.nav-menu').classList.toggle('mobile-open'); }
-        function toggleLoader(show) { const l=document.getElementById('loader'); show?l.classList.add('active'):l.classList.remove('active'); }
-        function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
-        function copy(t) { if(!t) return showToast("Sem dado"); navigator.clipboard.writeText(t); showToast("Copiado"); }
+        function toggleSearch() {
+            const s = document.getElementById('search-container');
+            navTo('shop');
+            s.classList.toggle('hidden');
+        }
         function previewAvatar(url) { if(url) document.getElementById('prof-avatar-preview').src=url; }
-        function showApp() { 
-            document.getElementById('auth-overlay').classList.add('hidden'); 
-            document.getElementById('app-shell').classList.remove('hidden'); 
-            updateSidebarUI(); 
-        }
+        function showApp() { document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('app-shell').classList.remove('hidden'); updateSidebarUI(); }
         function updateSidebarUI() {
             document.getElementById('sb-name').innerText = currentUser.user;
             const btn = document.getElementById('nav-btn-sell');
@@ -808,16 +901,11 @@
             else { btn.classList.add('hidden'); lbl.innerText='Comprador'; lbl.style.color='#777'; }
             if(currentUser.avatar) document.getElementById('sb-avatar').src=currentUser.avatar;
         }
-        function toggleSearch() {
-            const s = document.getElementById('search-container');
-            navTo('shop');
-            s.classList.toggle('hidden');
-        }
-        // Placeholder for seller profile render to maintain flow
-        function renderSellerProfile(name) {
-             // Redefine esta função se quiser re-implementar o perfil público
-             showToast(`Visualizando perfil de ${name}`);
-        }
+        function toggleAuth() { document.getElementById('login-box').classList.toggle('hidden'); document.getElementById('register-box').classList.toggle('hidden'); }
+        function toggleMobileMenu() { document.querySelector('.nav-menu').classList.toggle('mobile-open'); }
+        function toggleLoader(show) { const l=document.getElementById('loader'); show?l.classList.add('active'):l.classList.remove('active'); }
+        function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+        function copy(t) { if(!t) return showToast("Sem dado"); navigator.clipboard.writeText(t); showToast("Copiado"); }
 
         init();
     </script>
