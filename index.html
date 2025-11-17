@@ -81,7 +81,7 @@
         }
         .nav-menu button i { width: 20px; text-align: center; }
 
-        /* NOVO: Estilo para o botão de Pesquisa na sidebar (melhorando o estilo) */
+        /* Estilo para o botão de Pesquisa */
         #btn-search-toggle {
             width: 100%; background: transparent; color: var(--text-muted);
             text-align: left; padding: 12px; margin-bottom: 5px; border-radius: 6px;
@@ -130,20 +130,46 @@
         }
         .toast.show { transform: translateY(0); }
 
-        /* Mobile Responsivo */
+        /* --- MOBILE RESPONSIVO (Correção aplicada aqui) --- */
         @media(max-width: 768px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
-            aside { width: 100%; height: auto; flex-direction: row; justify-content: space-between; align-items: center; padding: 10px; }
+            /* SIDEBAR NO MOBILE: Linha horizontal no topo */
+            aside { 
+                width: 100%; height: auto; 
+                flex-direction: row; 
+                justify-content: space-between; 
+                align-items: center; 
+                padding: 10px; 
+            }
             .user-mini-profile { flex-direction: row; margin: 0; padding: 0; border: none; gap: 10px; }
             .avatar-circle { width: 40px; height: 40px; margin: 0; }
             .user-role { display: none; }
+            
+            /* Contêiner para os botões de controle (Hambúrguer e Lupa) */
+            .mobile-controls { display: flex; gap: 10px; } 
+
             .nav-menu { display: none; position: absolute; top: 60px; left:0; width:100%; background: var(--bg-sidebar); padding: 10px; z-index: 999; }
             .nav-menu.mobile-open { display: block; }
-            .mobile-toggle { display: block; font-size: 1.5rem; cursor: pointer; }
+            .mobile-toggle { display: block; font-size: 1.5rem; cursor: pointer; color: var(--text-main); }
             .profile-form { grid-template-columns: 1fr; }
-            #btn-search-toggle { display: none !important; } /* Oculta o botão de busca na sidebar no mobile para simplificar */
+            
+            /* ESTILO ESPECÍFICO DA LUPA NO MOBILE: APENAS ÍCONE */
+            #btn-search-toggle { 
+                width: 40px; 
+                height: 40px;
+                padding: 0; 
+                border: none; 
+                display: flex; 
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+            }
+            #btn-search-toggle span { display: none; } /* Oculta o texto "Pesquisar" no mobile */
         }
-        @media(min-width: 769px) { .mobile-toggle { display: none; } }
+        @media(min-width: 769px) { 
+            .mobile-toggle { display: none; } 
+            .mobile-controls { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -185,10 +211,13 @@
                 <div class="user-role">Vendedor Verificado</div>
             </div>
             
-            <div class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></div>
+            <div class="mobile-controls">
+                <button id="btn-search-toggle" onclick="toggleSearch()" title="Pesquisar Produtos">
+                    <i class="fas fa-search"></i> <span>Pesquisar</span>
+                </button>
+                <div class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></div>
+            </div>
             
-            <button id="btn-search-toggle" onclick="toggleSearch()" title="Pesquisar Produtos"><i class="fas fa-search"></i> Pesquisar</button>
-
             <nav class="nav-menu" id="nav-menu">
                 <button onclick="navTo('shop')" id="btn-shop" class="active"><i class="fas fa-store"></i> Loja Global</button>
                 <button onclick="navTo('sell')"><i class="fas fa-plus-circle"></i> Anunciar Produto</button>
