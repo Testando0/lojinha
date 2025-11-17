@@ -93,7 +93,7 @@
         main { 
             flex: 1; 
             padding: 30px; 
-            padding-bottom: 100px; /* ✅ CORREÇÃO APLICADA: Maior clearance para o scroll */
+            padding-bottom: 100px; /* ✅ FIX: Maior clearance para o scroll */
             overflow-y: auto; 
             position: relative; 
         }
@@ -122,7 +122,7 @@
         .profile-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .full-width { grid-column: span 2; }
 
-        /* --- NOVO: MODAL DE DETALHES E AVALIAÇÕES --- */
+        /* --- MODAL DE DETALHES E AVALIAÇÕES --- */
         #product-detail-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); z-index: 1000;
@@ -209,7 +209,7 @@
             /* CORREÇÃO DO CONTEÚDO PRINCIPAL */
             main { 
                 padding: 15px; 
-                padding-bottom: 80px; /* ✅ CORREÇÃO APLICADA: Maior clearance para o scroll mobile */
+                padding-bottom: 80px; /* ✅ FIX: Maior clearance para o scroll mobile */
                 overflow-y: auto; 
                 height: calc(100vh - 60px); 
             }
@@ -429,7 +429,7 @@
                 currentUser = JSON.parse(session);
                 showApp();
                 loadData();
-                setupRatingInput();
+                setupRatingInput(); // Inicializa a lógica de estrelas
             }
         }
 
@@ -641,7 +641,7 @@
                 name: n, img: i, price: pr, desc: d,
                 sellerPix: currentUser.pix, 
                 sellerWpp: currentUser.wpp,
-                reviews: []
+                reviews: [] // Inicializa array de reviews
             });
 
             if(await saveData()) {
@@ -710,10 +710,12 @@
 
         function getStarHTML(rating, size = 1) {
             let html = '';
+            // Arredonda para o meio mais próximo para considerar meia estrela
+            const roundedRating = Math.round(rating * 2) / 2;
             for (let i = 1; i <= 5; i++) {
-                if (i <= rating) {
+                if (i <= roundedRating) {
                     html += `<i class="fas fa-star" style="font-size: ${size}rem;"></i>`;
-                } else if (i - rating < 1 && i - rating > 0) {
+                } else if (i - 0.5 === roundedRating) {
                     html += `<i class="fas fa-star-half-alt" style="font-size: ${size}rem;"></i>`;
                 } else {
                     html += `<i class="far fa-star" style="font-size: ${size}rem;"></i>`;
@@ -859,7 +861,9 @@
 
             if (await saveData()) {
                 showToast("Avaliação enviada!");
+                // Reabre o modal para atualizar a média e a lista
                 openProductDetail(currentProductId); 
+                // Atualiza a loja para mostrar a nova média de estrelas no card
                 renderShop(); 
             }
         }
