@@ -234,6 +234,7 @@
                 <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px; text-align:left;">Dados de Pagamento (PIX/WPP são obrigatórios para vender):</p>
                 <input type="text" id="r-pix" placeholder="Chave PIX">
                 <input type="text" id="r-wpp" placeholder="WhatsApp (com DDD)">
+                <input type="text" id="r-code" placeholder="Código de Vendedor">
             </div>
 
             <button onclick="doRegister()" class="btn btn-accent" style="width:100%">Criar Conta</button>
@@ -404,11 +405,17 @@
             const isSeller = document.getElementById('r-is-seller').checked;
             
             if(!u || !p) return showToast("Preencha usuário e senha");
-            let pix='', wpp='';
+            let pix='', wpp='', code='';
             if(isSeller) {
                 pix = document.getElementById('r-pix').value;
                 wpp = document.getElementById('r-wpp').value;
+                code = document.getElementById('r-code').value; // PEGA O CÓDIGO
                 if(!pix || !wpp) return showToast("Vendedor precisa de PIX/WPP");
+                
+                // VERIFICA O CÓDIGO
+                if(code !== 'STORERED52') {
+                    return showToast("Código de Vendedor Inválido!");
+                }
             }
 
             toggleLoader(true);
